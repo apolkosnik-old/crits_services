@@ -1,5 +1,5 @@
-# Copyright (c) 2014, The MITRE Corporation. All rights reserved.
-# Copyright (c) 2014, Adam Polkosnik, Team Cymru.  All rights reserved.
+# Copyright (c) 2015, The MITRE Corporation. All rights reserved.
+# Copyright (c) 2015, Adam Polkosnik, Team Cymru.  All rights reserved.
 
 # Source code distributed pursuant to license agreement.
 # PEhash computing code is from Team Cymru.
@@ -37,7 +37,7 @@ class PEInfoService(Service):
     """
 
     name = "peinfo"
-    version = '1.1.3'
+    version = '1.1.4'
     supported_types = ['Sample']
     description = "Generate metadata about Windows PE/COFF files."
     added_files = []
@@ -73,7 +73,7 @@ class PEInfoService(Service):
         img_chars = bitstring.BitArray(hex(exe.FILE_HEADER.Characteristics))
         #pad to 16 bits
         img_chars = bitstring.BitArray(bytes=img_chars.tobytes())
-        img_chars_xor = img_chars[0:8] ^ img_chars[8:16]
+        img_chars_xor = img_chars[0:7] ^ img_chars[8:15]
 
         #start to build pehash
         pehash_bin = bitstring.BitArray(img_chars_xor)
@@ -82,7 +82,7 @@ class PEInfoService(Service):
         sub_chars = bitstring.BitArray(hex(exe.FILE_HEADER.Machine))
         #pad to 16 bits
         sub_chars = bitstring.BitArray(bytes=sub_chars.tobytes())
-        sub_chars_xor = sub_chars[0:8] ^ sub_chars[8:16]
+        sub_chars_xor = sub_chars[0:7] ^ sub_chars[8:15]
         pehash_bin.append(sub_chars_xor)
 
         #Stack Commit Size
@@ -90,7 +90,7 @@ class PEInfoService(Service):
         stk_size_bits = string.zfill(stk_size.bin, 32)
         #now xor the bits
         stk_size = bitstring.BitArray(bin=stk_size_bits)
-        stk_size_xor = stk_size[8:16] ^ stk_size[16:24] ^ stk_size[24:32]
+        stk_size_xor = stk_size[8:15] ^ stk_size[16:23] ^ stk_size[24:31]
         #pad to 8 bits
         stk_size_xor = bitstring.BitArray(bytes=stk_size_xor.tobytes())
         pehash_bin.append(stk_size_xor)
@@ -100,7 +100,7 @@ class PEInfoService(Service):
         hp_size_bits = string.zfill(hp_size.bin, 32)
         #now xor the bits
         hp_size = bitstring.BitArray(bin=hp_size_bits)
-        hp_size_xor = hp_size[8:16] ^ hp_size[16:24] ^ hp_size[24:32]
+        hp_size_xor = hp_size[8:15] ^ hp_size[16:23] ^ hp_size[24:31]
         #pad to 8 bits
         hp_size_xor = bitstring.BitArray(bytes=hp_size_xor.tobytes())
         pehash_bin.append(hp_size_xor)
@@ -110,8 +110,7 @@ class PEInfoService(Service):
             #virutal address
             sect_va =  bitstring.BitArray(hex(section.VirtualAddress))
             sect_va = bitstring.BitArray(bytes=sect_va.tobytes())
-            sect_va_bits = sect_va[8:32]
-            pehash_bin.append(sect_va_bits)
+            pehash_bin.append(sect_va)
 
             #rawsize
             sect_rs =  bitstring.BitArray(hex(section.SizeOfRawData))
@@ -119,13 +118,13 @@ class PEInfoService(Service):
             sect_rs_bits = string.zfill(sect_rs.bin, 32)
             sect_rs = bitstring.BitArray(bin=sect_rs_bits)
             sect_rs = bitstring.BitArray(bytes=sect_rs.tobytes())
-            sect_rs_bits = sect_rs[8:32]
+            sect_rs_bits = sect_rs[8:31]
             pehash_bin.append(sect_rs_bits)
 
             #section chars
             sect_chars =  bitstring.BitArray(hex(section.Characteristics))
             sect_chars = bitstring.BitArray(bytes=sect_chars.tobytes())
-            sect_chars_xor = sect_chars[16:24] ^ sect_chars[24:32]
+            sect_chars_xor = sect_chars[16:23] ^ sect_chars[24:31]
             pehash_bin.append(sect_chars_xor)
 
             #entropy calulation
@@ -134,14 +133,14 @@ class PEInfoService(Service):
             raw = exe.write()[address+size:]
             if size == 0:
                 kolmog = bitstring.BitArray(float=1, length=32)
-                pehash_bin.append(kolmog[0:8])
+                pehash_bin.append(kolmog[0:7])
                 continue
             bz2_raw = bz2.compress(raw)
             bz2_size = len(bz2_raw)
             #k = round(bz2_size / size, 5)
             k = bz2_size / size
             kolmog = bitstring.BitArray(float=k, length=32)
-            pehash_bin.append(kolmog[0:8])
+            pehash_bin.append(kolmog[0:7])
 
         m = hashlib.sha1()
         m.update(pehash_bin.tobytes())
@@ -202,8 +201,13 @@ class PEInfoService(Service):
         if callable(getattr(pe, 'get_imphash', None)):
             self._get_imphash(pe)
         else:
-            self._debug("pefile does not support get_imphash, upgrade to 1.2.10-139")
-
+            (pef_ver, pef_rev) = pefile.__version__.split('-')
+            (v1, v2, v3) = pef_ver.split('.')
+            self._debug("v1:%d v2:%d v3:%d rev:%d , pefver: %d " % (int(v1), int(v2), int(v3), int(pef_rev), (int(v1)*1000 + int(v2)*100 + int(v3) ) )
+            if(((int(v1)*1000 + int(v2)*100 + int(v3)) <= 1210) and int(pef_rev) < 139):
+                self._debug("pefile does not support get_imphash, upgrade to 1.2.10-139")
+            else:
+                self._debug("pefile couldn't call get_imphash()")
         self._get_timestamp(pe)
         self._get_rich_header(pe)
 
@@ -235,7 +239,7 @@ class PEInfoService(Service):
         for i in xrange(len(data) // 2):
             if data[2 * i] == 0x68636952: # Rich
                 if data[2 * i + 1] != checksum:
-                    self._parse_error('Rich Header corrupted')
+                    self._parse_error('Rich Header corrupted', Exception)
                 break
             headervalues += [data[2 * i] ^ checksum, data[2 * i + 1] ^ checksum]
 
@@ -268,7 +272,7 @@ class PEInfoService(Service):
                             "resource_id": i.id,
                             "language": x.lang,
                             "sub_language": x.sublang,
-                            "address": x.struct.OffsetToData,
+                            "address": hex(x.struct.OffsetToData),
                             "size": len(data),
                             "md5": hashlib.md5(data).hexdigest(),
                     }
@@ -288,7 +292,7 @@ class PEInfoService(Service):
                 if section_name == "":
                     section_name = "NULL"
                 data = {
-                        "virt_address": section.VirtualAddress,
+                        "virt_address": hex(section.VirtualAddress),
                         "virt_size": section.Misc_VirtualSize,
                         "size": section.SizeOfRawData,
                         "md5": section.get_hash_md5(),
@@ -311,6 +315,7 @@ class PEInfoService(Service):
                             "dll": "%s" % entry.dll,
                             "ordinal": "%s" % imp.ordinal,
                     }
+                    self._debug("import_data: '%s'" % data )
                     self._add_result('pe_import', name, data)
         except Exception as e:
             self._parse_error("imports", e)
@@ -318,9 +323,12 @@ class PEInfoService(Service):
     def _get_exports(self, pe):
         try:
             for entry in pe.DIRECTORY_ENTRY_EXPORT.symbols:
-                data = {"rva_offset": pe.OPTIONAL_HEADER.ImageBase
-                                        + entry.address}
-                self._add_result('pe_export', entry.name, data)
+                data = {"rva_offset": hex(pe.OPTIONAL_HEADER.ImageBase
+                                        + entry.address)}
+                ename = 'NULL'
+                if entry.name:
+                    ename = entry.name
+                self._add_result('pe_export', ename, data)
         except Exception as e:
             self._parse_error("exports", e)
 
@@ -343,7 +351,7 @@ class PEInfoService(Service):
                     result = {
                          'MajorVersion': dbg.struct.MajorVersion,
                          'MinorVersion': dbg.struct.MinorVersion,
-                         'PointerToRawData': dbg.struct.PointerToRawData,
+                         'PointerToRawData': hex(dbg.struct.PointerToRawData),
                          'SizeOfData': dbg.struct.SizeOfData,
                          'TimeDateStamp': dbg.struct.TimeDateStamp,
                          'TimeDateString': strftime('%Y-%m-%d %H:%M:%S', localtime(dbg.struct.TimeDateStamp)),
