@@ -1,6 +1,6 @@
 """
 Example Usage:
-    python impact_alerting.py -t "Address - ipv4-addr" -i low,medium,high -a "Firewall Block"
+    python impact_alerting.py -t "IPv4 Address" -i low,medium,high -a "Firewall Block"
 """
 
 import sys
@@ -16,7 +16,7 @@ class CRITsScript(CRITsBaseScript):
     def run(self, argv):
         parser = OptionParser()
         parser.add_option("-t", "--type", dest="itype", default=None,
-            help="Type of indicator you want to query for (ex: \"Address - ipv4-addr\", \"URI - Domain Name\", etc.")
+            help="Type of indicator you want to query for (ex: \"IPv4 Address\", \"Domain\", etc.")
         parser.add_option("-c", "--confidence", dest="confidence", default=None,
             help="Confidence level (unknown, benign, low, medium, high) minimum value. Specify multiple values separated with a comma.")
         parser.add_option("-i", "--impact", dest="impact", default=None,
