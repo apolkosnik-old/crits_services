@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from builtins import str
 # (c) 2015, Adam Polkosnik, <adam.polkosnik@ny.frb.org> || <apolkosnik@gmail.com>
 
 import logging
@@ -14,7 +16,7 @@ logger = logging.getLogger(__name__)
 from crits.samples.handlers import handle_file
 
 # For decoding and extracting the payloads 
-from SEPLQ import ExtractPayloads
+from .SEPLQ import ExtractPayloads
 # for getting the filename
 import ntpath
 # to feed the file into CRITs
@@ -55,7 +57,7 @@ class SEPLQService(Service):
         (metaoutcsv, data) = ExtractPayloads(datacq)
         h = md5(data).hexdigest()
         name = h
-	metaout = metaoutcsv.split(",")
+        metaout = metaoutcsv.split(",")
         name = ntpath.basename(str(metaout[0]))
         fields = (
         "Filename",
@@ -90,7 +92,7 @@ class SEPLQService(Service):
         self._info("name: %s" % name )
         n = 0
         for i in metaout:
-	    if i and i != 0 and i != "0" and i != "":
+            if i and i != 0 and i != "0" and i != "":
                 self._info("meta: %s" % str(i))
                 self._add_result('SEPLQ', str(i)) 
             n+=1

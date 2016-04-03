@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from builtins import str
 import binascii
 import hashlib
 
@@ -7,7 +9,7 @@ from crits.services.core import Service, ServiceConfigError
 from crits.samples.handlers import handle_file
 from crits.vocabulary.relationships import RelationshipTypes
 
-from office_meta import OfficeParser
+from .office_meta import OfficeParser
 from . import forms
 
 class OfficeMetaService(Service):

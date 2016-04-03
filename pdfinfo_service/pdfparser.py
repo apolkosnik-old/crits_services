@@ -1,5 +1,15 @@
 #!/usr/bin/python
 
+from __future__ import print_function
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import bytes
+from builtins import chr
+from builtins import range
+from past.utils import old_div
+from builtins import object
 __description__ = 'pdf-parser, use it to parse a PDF document'
 __author__ = 'Didier Stevens'
 __version__ = '0.6.0'
@@ -77,7 +87,7 @@ if sys.version_info[0] >= 3:
     urllib23 = urllib.request
 else:
     from io import BytesIO
-    import urllib2
+    import urllib.request, urllib.error, urllib.parse
     urllib23 = urllib2
 try:
     import yara
@@ -122,9 +132,9 @@ def CopyWithoutWhiteSpace(content):
     return result
 
 def Obj2Str(content):
-    return ''.join(map(lambda x: repr(x[1])[1:-1], CopyWithoutWhiteSpace(content)))
+    return ''.join([repr(x[1])[1:-1] for x in CopyWithoutWhiteSpace(content)])
 
-class cPDFDocument:
+class cPDFDocument(object):
     def __init__(self, file):
         self.file = file
         if file.lower().startswith('http://') or file.lower().startswith('https://'):
@@ -181,7 +191,7 @@ def CharacterClass(byte):
 def IsNumeric(str):
     return re.match('^[0-9]+', str)
 
-class cPDFTokenizer:
+class cPDFTokenizer(object):
     def __init__(self, file):
         self.oPDF = cPDFDocument(file)
         self.ungetted = []
@@ -260,7 +270,7 @@ class cPDFTokenizer:
     def unget(self, byte):
         self.ungetted.append(byte)
 
-class cPDFParser:
+class cPDFParser(object):
     def __init__(self, file, verbose=False, extract=None):
         self.context = CONTEXT_NONE
         self.content = []
@@ -376,7 +386,7 @@ class cPDFParser:
             else:
                 break
 
-class cPDFElementComment:
+class cPDFElementComment(object):
     def __init__(self, comment):
         self.type = PDF_ELEMENT_COMMENT
         self.comment = comment
@@ -385,12 +395,12 @@ class cPDFElementComment:
 #                        elif re.match('^%%EOF', self.token[1]):
 #                            print(repr(self.token[1]))
 
-class cPDFElementXref:
+class cPDFElementXref(object):
     def __init__(self, content):
         self.type = PDF_ELEMENT_XREF
         self.content = content
 
-class cPDFElementTrailer:
+class cPDFElementTrailer(object):
     def __init__(self, content):
         self.type = PDF_ELEMENT_TRAILER
         self.content = content
@@ -410,7 +420,7 @@ def IIf(expr, truepart, falsepart):
     else:
         return falsepart
 
-class cPDFElementIndirectObject:
+class cPDFElementIndirectObject(object):
     def __init__(self, id, version, content):
         self.type = PDF_ELEMENT_INDIRECT_OBJECT
         self.id = id
@@ -568,12 +578,12 @@ def mycallback(data):
     print(data['rule'])
     yara.CALLBACK_CONTINUE
 
-class cPDFElementStartxref:
+class cPDFElementStartxref(object):
     def __init__(self, index):
         self.type = PDF_ELEMENT_STARTXREF
         self.index = index
 
-class cPDFElementMalformed:
+class cPDFElementMalformed(object):
     def __init__(self, content):
         self.type = PDF_ELEMENT_MALFORMED
         self.content = content
@@ -588,7 +598,7 @@ def TrimRWhiteSpace(data):
         data = data[:-1]
     return data
 
-class cPDFParseDictionary:
+class cPDFParseDictionary(object):
     def __init__(self, content, nocanonicalizedoutput):
         self.content = content
         self.nocanonicalizedoutput = nocanonicalizedoutput
@@ -684,7 +694,7 @@ class cPDFParseDictionary:
 def FormatOutput(data, raw):
     if raw:
         if type(data) == type([]):
-            return ''.join(map(lambda x: x[1], data))
+            return ''.join([x[1] for x in data])
         else:
             return data
     else:
@@ -693,7 +703,7 @@ def FormatOutput(data, raw):
 def PrintOutputObject(object, options):
     print('obj %d %d' % (object.id, object.version))
     print(' Type: %s' % ConditionalCanonicalize(object.GetType(), options.nocanonicalizedoutput))
-    print(' Referencing: %s' % ', '.join(map(lambda x: '%s %s %s' % x, object.GetReferences())))
+    print(' Referencing: %s' % ', '.join(['%s %s %s' % x for x in object.GetReferences()]))
     dataPrecedingStream = object.ContainsStream()
     oPDFParseDictionary = None
     if dataPrecedingStream:
@@ -934,7 +944,7 @@ def File2Strings(filename):
     except:
         return None
     try:
-        return map(lambda line:line.rstrip('\n'), f.readlines())
+        return [line.rstrip('\n') for line in f.readlines()]
     except:
         return None
     finally:
@@ -985,7 +995,7 @@ def content2JSON(obj):
     except:
         traceback.print_exc()
         v = "fail"
-    encoded = unicode(FormatOutput(obj.content, True),errors='replace')
+    encoded = str(FormatOutput(obj.content, True),errors='replace')
 
     if filtered == []:
         decoded = 'Object contained no stream or decoding failed'
@@ -997,7 +1007,7 @@ def content2JSON(obj):
         except:
             traceback.print_exc()
             v = "fail"
-        decoded = unicode(FormatOutput(filtered, True),errors='replace')
+        decoded = str(FormatOutput(filtered, True),errors='replace')
 
     version = obj.version
     raw_content = FormatOutput(obj.content, True)
@@ -1042,7 +1052,7 @@ def H(data):
         data_counts[lord(d)] += 1
 
     for x in range(0, 256):
-        p_x = float(data_counts[x])/len_data
+        p_x = old_div(float(data_counts[x]),len_data)
 
         if p_x > 0:
             entropy += - p_x*math.log(p_x, 2)
@@ -1355,10 +1365,10 @@ def Main():
             print('Trailer: %s' % cntTrailer)
             print('StartXref: %s' % cntStartXref)
             print('Indirect object: %s' % cntIndirectObject)
-            names = dicObjectTypes.keys()
+            names = list(dicObjectTypes.keys())
             names.sort()
             for key in names:
-                print(' %s %d: %s' % (key, len(dicObjectTypes[key]), ', '.join(map(lambda x: '%d' % x, dicObjectTypes[key]))))
+                print(' %s %d: %s' % (key, len(dicObjectTypes[key]), ', '.join(['%d' % x for x in dicObjectTypes[key]])))
 
         if options.generate:
             print("    oPDF.xrefAndTrailer('%s')" % ' '.join(savedRoot))

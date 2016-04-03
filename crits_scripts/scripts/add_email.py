@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import str
 from optparse import OptionParser
 
 # Crits imports
@@ -28,11 +30,11 @@ class CRITsScript(CRITsBaseScript):
         (opts, args) = oparse.parse_args(argv)
 
         if not opts.eml and not opts.json and not opts.yaml:
-            print "Need a filename."
+            print("Need a filename.")
             return
 
         if not opts.source:
-            print "[-] Need a source."
+            print("[-] Need a source.")
             return
 
         if opts.eml:
@@ -56,10 +58,10 @@ class CRITsScript(CRITsBaseScript):
             data = fh.read()
             fh.close()
         except IOError:
-            print "[-] Cannot open %s for reading!" % filename
+            print("[-] Cannot open %s for reading!" % filename)
             return
         except:
-            print "[-] Cannot open file."
+            print("[-] Cannot open file.")
             return
 
         obj = handler(data, opts.source, opts.reference, self.username,
@@ -67,11 +69,11 @@ class CRITsScript(CRITsBaseScript):
         if obj['status']:
             try:
                 obj['object'].save()
-            except Exception, e:
+            except Exception as e:
                 message = "Failed to save object: %s " % str(e)
 
-            print "[-] Success: %s" % obj['object'].id
-            for (f, v) in obj.get('attachments', {}).items():
-                print "\t[-] Attachment: %s" % v['filename']
+            print("[-] Success: %s" % obj['object'].id)
+            for (f, v) in list(obj.get('attachments', {}).items()):
+                print("\t[-] Attachment: %s" % v['filename'])
         else:
-            print "[!] Failure: %s" % obj['reason']
+            print("[!] Failure: %s" % obj['reason'])

@@ -1,3 +1,4 @@
+from builtins import str
 import logging
 import zlib
 
@@ -144,7 +145,7 @@ class pyinstallerService(Service):
                                                                         result['message'])
                                 )
                     self._add_result("Info", t[5], d)
-            except Exception, e:
+            except Exception as e:
                 self._info("Error: %s" % str(e))
 
     def run(self, obj, config):

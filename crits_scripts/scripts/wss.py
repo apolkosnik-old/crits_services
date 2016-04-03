@@ -125,14 +125,18 @@ This uses CGIHTTPServer and CGIHTTPServer is not secure.
 It may execute arbitrary Python code or external programs. It should not be
 used outside a firewall.
 """
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 
-import BaseHTTPServer
-import CGIHTTPServer
-import SimpleHTTPServer
-import SocketServer
-import ConfigParser
+import http.server
+import http.server
+import http.server
+import socketserver
+import configparser
 import base64
-import httplib
+import http.client
 import logging
 import logging.handlers
 import optparse
@@ -338,7 +342,8 @@ class CRITsScript(CRITsBaseScript):
 
                 try:
                     return self._connection.recv(bufsize)
-                except OpenSSL.SSL.SysCallError, (err, message):
+                except OpenSSL.SSL.SysCallError as xxx_todo_changeme:
+                    (err, message) = xxx_todo_changeme.args
                     if err == -1:
                         # Suppress "unexpected EOF" exception. See the OpenSSL document
                         # for SSL_get_error.
@@ -366,13 +371,13 @@ class CRITsScript(CRITsBaseScript):
                     try:
                         dispatcher.add_resource_path_alias(
                             m.group(1), m.group(2))
-                    except dispatch.DispatchException, e:
+                    except dispatch.DispatchException as e:
                         logging.error(str(e))
             finally:
                 fp.close()
 
 
-        class WebSocketServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
+        class WebSocketServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
             """HTTPServer specialized for WebSocket."""
 
             # Overrides SocketServer.ThreadingMixIn.daemon_threads
@@ -406,7 +411,7 @@ class CRITsScript(CRITsBaseScript):
                 self.__ws_is_shut_down = threading.Event()
                 self.__ws_serving = False
 
-                SocketServer.BaseServer.__init__(
+                socketserver.BaseServer.__init__(
                     self, (options.server_host, options.port), WebSocketRequestHandler)
 
                 # Expose the options object to allow handler objects access it. We name
@@ -442,7 +447,7 @@ class CRITsScript(CRITsBaseScript):
                     family, socktype, proto, canonname, sockaddr = addrinfo
                     try:
                         socket_ = socket.socket(family, socktype)
-                    except Exception, e:
+                    except Exception as e:
                         self._logger.info('Skip by failure: %r', e)
                         continue
                     server_options = self.websocket_server_options
@@ -480,7 +485,7 @@ class CRITsScript(CRITsBaseScript):
                         socket_.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                     try:
                         socket_.bind(self.server_address)
-                    except Exception, e:
+                    except Exception as e:
                         self._logger.info('Skip by failure: %r', e)
                         socket_.close()
                         failed_sockets.append(socketinfo)
@@ -509,7 +514,7 @@ class CRITsScript(CRITsBaseScript):
                     self._logger.info('Listen on: %r', addrinfo)
                     try:
                         socket_.listen(self.request_queue_size)
-                    except Exception, e:
+                    except Exception as e:
                         self._logger.info('Skip by failure: %r', e)
                         socket_.close()
                         failed_sockets.append(socketinfo)
@@ -560,7 +565,7 @@ class CRITsScript(CRITsBaseScript):
                     if server_options.tls_module == _TLS_BY_STANDARD_MODULE:
                         try:
                             accepted_socket.do_handshake()
-                        except ssl.SSLError, e:
+                        except ssl.SSLError as e:
                             self._logger.debug('%r', e)
                             raise
 
@@ -599,7 +604,7 @@ class CRITsScript(CRITsBaseScript):
                         # TODO(tyoshino): Convert all kinds of errors.
                         try:
                             accepted_socket.do_handshake()
-                        except OpenSSL.SSL.Error, e:
+                        except OpenSSL.SSL.Error as e:
                             # Set errno part to 1 (SSL_ERROR_SSL) like the ssl module
                             # does.
                             self._logger.debug('%r', e)
@@ -643,11 +648,11 @@ class CRITsScript(CRITsBaseScript):
                 self.__ws_is_shut_down.wait()
 
 
-        class WebSocketRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
+        class WebSocketRequestHandler(http.server.CGIHTTPRequestHandler):
             """CGIHTTPRequestHandler specialized for WebSocket."""
 
             # Use httplib.HTTPMessage instead of mimetools.Message.
-            MessageClass = httplib.HTTPMessage
+            MessageClass = http.client.HTTPMessage
 
             def setup(self):
                 """Override SocketServer.StreamRequestHandler.setup to wrap rfile
@@ -663,7 +668,7 @@ class CRITsScript(CRITsBaseScript):
                 # Call superclass's setup to prepare rfile, wfile, etc. See setup
                 # definition on the root class SocketServer.StreamRequestHandler to
                 # understand what this does.
-                CGIHTTPServer.CGIHTTPRequestHandler.setup(self)
+                http.server.CGIHTTPRequestHandler.setup(self)
 
                 self.rfile = memorizingfile.MemorizingFile(
                     self.rfile,
@@ -681,7 +686,7 @@ class CRITsScript(CRITsBaseScript):
                     self.is_executable = self._options.is_executable_method
 
                 # This actually calls BaseRequestHandler.__init__.
-                CGIHTTPServer.CGIHTTPRequestHandler.__init__(
+                http.server.CGIHTTPRequestHandler.__init__(
                     self, request, client_address, server)
 
             def parse_request(self):
@@ -702,7 +707,7 @@ class CRITsScript(CRITsBaseScript):
                 # handling (self.path, self.command, self.requestline, etc. See also
                 # how _StandaloneRequest's members are implemented using these
                 # attributes).
-                if not CGIHTTPServer.CGIHTTPRequestHandler.parse_request(self):
+                if not http.server.CGIHTTPRequestHandler.parse_request(self):
                     return False
 
                 if self._options.use_basic_auth:
@@ -749,7 +754,7 @@ class CRITsScript(CRITsBaseScript):
                                         self.path)
                         self._logger.info('Fallback to CGIHTTPRequestHandler')
                         return True
-                except dispatch.DispatchException, e:
+                except dispatch.DispatchException as e:
                     self._logger.info('Dispatch failed for error: %s', e)
                     self.send_error(e.status)
                     return False
@@ -765,14 +770,14 @@ class CRITsScript(CRITsBaseScript):
                             self._options.dispatcher,
                             allowDraft75=self._options.allow_draft75,
                             strict=self._options.strict)
-                    except handshake.VersionException, e:
+                    except handshake.VersionException as e:
                         self._logger.info('Handshake failed for version error: %s', e)
                         self.send_response(common.HTTP_STATUS_BAD_REQUEST)
                         self.send_header(common.SEC_WEBSOCKET_VERSION_HEADER,
                                         e.supported_versions)
                         self.end_headers()
                         return False
-                    except handshake.HandshakeException, e:
+                    except handshake.HandshakeException as e:
                         # Handshake for ws(s) failed.
                         self._logger.info('Handshake failed for error: %s', e)
                         self.send_error(e.status)
@@ -780,7 +785,7 @@ class CRITsScript(CRITsBaseScript):
 
                     request._dispatcher = self._options.dispatcher
                     self._options.dispatcher.transfer_data(request)
-                except handshake.AbortedByUserException, e:
+                except handshake.AbortedByUserException as e:
                     self._logger.info('Aborted: %s', e)
                 return False
 
@@ -808,7 +813,7 @@ class CRITsScript(CRITsBaseScript):
                 rather than a CGI script.
                 """
 
-                if CGIHTTPServer.CGIHTTPRequestHandler.is_cgi(self):
+                if http.server.CGIHTTPRequestHandler.is_cgi(self):
                     if '..' in self.path:
                         return False
                     # strip query parameter from request path
@@ -1021,14 +1026,14 @@ class CRITsScript(CRITsBaseScript):
             if temporary_options.config_file:
                 try:
                     config_fp = open(temporary_options.config_file, 'r')
-                except IOError, e:
+                except IOError as e:
                     logging.critical(
                         'Failed to open configuration file %r: %r',
                         temporary_options.config_file,
                         e)
                     sys.exit(1)
 
-                config_parser = ConfigParser.SafeConfigParser()
+                config_parser = configparser.SafeConfigParser()
                 config_parser.readfp(config_fp)
                 config_fp.close()
 
@@ -1153,7 +1158,7 @@ class CRITsScript(CRITsBaseScript):
 
                 server = WebSocketServer(options)
                 server.serve_forever()
-            except Exception, e:
+            except Exception as e:
                 logging.critical('mod_pywebsocket: %s' % e)
                 logging.critical('mod_pywebsocket: %s' % util.get_stack_trace())
                 sys.exit(1)

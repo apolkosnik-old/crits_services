@@ -1,8 +1,11 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import logging
 import simplejson
-import urllib
-import urllib2
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 import requests
 
 from hashlib import md5
@@ -69,12 +72,12 @@ class VirusTotalService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.VirusTotalConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -99,7 +102,7 @@ class VirusTotalService(Service):
 
         # Rename keys so they render nice.
         fields = forms.VirusTotalConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
 
         return display_config
@@ -170,24 +173,24 @@ class VirusTotalService(Service):
                 parameters = {"resource": obj.md5, "apikey": key, 'allinfo': 1}
             else:
                 parameters = {"resource": obj.md5, "apikey": key}
-            vt_data = urllib.urlencode(parameters)
-            req = urllib2.Request(sample_url, vt_data)
+            vt_data = urllib.parse.urlencode(parameters)
+            req = urllib.request.Request(sample_url, vt_data)
         elif obj._meta['crits_type'] == 'Domain':
             parameters = {'domain': obj.domain, 'apikey': key}
-            vt_data = urllib.urlencode(parameters)
-            req = urllib2.Request("%s?%s" % (domain_url, vt_data))
+            vt_data = urllib.parse.urlencode(parameters)
+            req = urllib.request.Request("%s?%s" % (domain_url, vt_data))
         elif obj._meta['crits_type'] == 'IP':
             parameters = {'ip': obj.ip, 'apikey': key}
-            vt_data = urllib.urlencode(parameters)
-            req = urllib2.Request("%s?%s" % (ip_url, vt_data))
+            vt_data = urllib.parse.urlencode(parameters)
+            req = urllib.request.Request("%s?%s" % (ip_url, vt_data))
 
         # Execute GET request
         if settings.HTTP_PROXY:
-            proxy = urllib2.ProxyHandler({'https': settings.HTTP_PROXY})
-            opener = urllib2.build_opener(proxy)
-            urllib2.install_opener(opener)
+            proxy = urllib.request.ProxyHandler({'https': settings.HTTP_PROXY})
+            opener = urllib.request.build_opener(proxy)
+            urllib.request.install_opener(opener)
         try:
-            response = urllib2.urlopen(req)
+            response = urllib.request.urlopen(req)
             json = response.read()
             response_dict = simplejson.loads(json)
         except Exception as e:
@@ -371,7 +374,7 @@ class VirusTotalService(Service):
                 'InternalName': exiftool_dict.get('InternalName', ''),
             }
             # Make sure at least one of the keys is set with a value.
-            for v in developerdata.values():
+            for v in list(developerdata.values()):
                 if v != '':
                     self._add_result('Developer Metadata', exiftool_dict.get('CompanyName', ''), developerdata)
                     break
@@ -393,7 +396,7 @@ class VirusTotalService(Service):
                 'Signing Date': sigcheck_dict.get('signing date', '')
             }
             # Make sure at least one of the keys is set with a value.
-            for v in sigcheck.values():
+            for v in list(sigcheck.values()):
                 if v != '':
                     self._add_result('Signature Information', sigcheck_dict.get('publisher', ''), sigcheck)
                     break
@@ -403,7 +406,7 @@ class VirusTotalService(Service):
         # PE Language Informaton
         pe_lang = additional_info_dict.get('pe-resource-langs', {})
         if pe_lang:
-            for k, v in pe_lang.iteritems():
+            for k, v in pe_lang.items():
                 self._add_result('Language Information', k, {'Value': v})
         else:
             status['message'].append("PE Language data not included in VT response.")

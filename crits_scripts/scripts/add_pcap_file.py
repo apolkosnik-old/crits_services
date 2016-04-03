@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import hashlib
 from optparse import OptionParser
@@ -56,6 +57,6 @@ class CRITsScript(CRITsBaseScript):
 
         if status['success']:
             md5 = hashlib.md5(data).hexdigest()
-            print "[+] Added %s (MD5: %s)" % (filename, md5)
+            print("[+] Added %s (MD5: %s)" % (filename, md5))
         else:
-            print "[-] %s returned error: %s" % (filename, status['message'])
+            print("[-] %s returned error: %s" % (filename, status['message']))

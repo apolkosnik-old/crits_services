@@ -1,3 +1,4 @@
+from __future__ import print_function
 from optparse import OptionParser
 
 from django.core.mail import send_mail
@@ -21,14 +22,14 @@ class CRITsScript(CRITsBaseScript):
 
         if opts.md5:
             if opts.verbose:
-                print "[+] attempting to call get_file on %s" % opts.md5
+                print("[+] attempting to call get_file on %s" % opts.md5)
             data = get_file(opts.md5)
         elif opts.file:
             fin = open(opts.file, 'rb')
             data = fin.read()
             fin.close()
         if opts.verbose:
-            print "[+] parsing %d bytes" % len(data)
+            print("[+] parsing %d bytes" % len(data))
         if len(data) > 512:
             oparser = OfficeParser(data, opts.verbose)
             oparser.parse_office_doc()

@@ -1,3 +1,7 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import next
 from crits.services.core import Service, ServiceConfigError
 from crits.samples.handlers import handle_file, get_sample_details
 from django.template.loader import render_to_string
@@ -5,7 +9,7 @@ from . import forms
 
 import cbapi
 import csv
-import cStringIO as StringIO
+import io as StringIO
 import json
 import ntpath
 import os
@@ -32,12 +36,12 @@ class CarbonBlackService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.CarbonBlackInegrationConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -55,7 +59,7 @@ class CarbonBlackService(Service):
         display_config = {}
         # Rename keys so they render nice.
         fields = forms.CarbonBlackInegrationConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
 
         return display_config
@@ -239,7 +243,7 @@ class CarbonBlackService(Service):
             nc_data = []
             try:
                 while 1:
-                    netconns = netconn_csv.next()
+                    netconns = next(netconn_csv)
                     nc = {}
                     IP = netconns[1]
                     if IP != self.obj.ip:
@@ -305,7 +309,7 @@ class CarbonBlackService(Service):
             nc_data = []
             try:
                 while 1:
-                    netconns = netconn_csv.next()
+                    netconns = next(netconn_csv)
                     nc = {}
                     domain = netconns[4]
                     if domain != self.obj.domain:
@@ -336,7 +340,7 @@ class CarbonBlackService(Service):
         modload_data = []
         try:
             while 1:
-                modloads = modload_csv.next()
+                modloads = next(modload_csv)
                 ml = {}
                 ml['subtype'] = title
                 ml['result'] = modloads['Md5']
@@ -360,7 +364,7 @@ class CarbonBlackService(Service):
         filemod_data = []
         try:
             while 1:
-                filemods = filemod_csv.next()
+                filemods = next(filemod_csv)
                 fm = {}
                 fm['subtype'] = title
                 fm['result'] = filemods['Path']
@@ -383,7 +387,7 @@ class CarbonBlackService(Service):
         regmod_data = []
         try:
             while 1:
-                regmods = regmod_csv.next()
+                regmods = next(regmod_csv)
                 rm = {}
                 rm['subtype'] = title
                 rm['result'] = regmods['ActionTypeDesc']
@@ -406,7 +410,7 @@ class CarbonBlackService(Service):
         netconn_data = []
         try:
             while 1:
-                netconns = netconn_csv.next()
+                netconns = next(netconn_csv)
                 nc = {}
                 nc['subtype'] = title
                 nc['result'] = netconns['Ip']
@@ -455,7 +459,7 @@ class CarbonBlackService(Service):
                     cp_data[child_pid]['process path'] = cpd[3]
 
             final_childproc_data = []
-            for child_pid, data in cp_data.iteritems():
+            for child_pid, data in cp_data.items():
                 cp = {}
                 cp['subtype'] = title
                 cp['result'] = data['process md5']

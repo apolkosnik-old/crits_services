@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import bytes
+from builtins import str
+from builtins import chr
+from builtins import map
+from builtins import range
+from past.utils import old_div
+from builtins import object
 __description__ = 'Tool to test a PDF file'
 __author__ = 'Didier Stevens'
 __version__ = '0.2.1'
@@ -66,7 +77,7 @@ import collections
 import glob
 import io
 try:
-    import urllib2
+    import urllib.request, urllib.error, urllib.parse
     urllib23 = urllib2
 except:
     import urllib.request
@@ -79,7 +90,7 @@ def C2BIP3(string):
     else:
         return string
 
-class cBinaryFile:
+class cBinaryFile(object):
     def __init__(self, file):
         self.file = file
         if file == '':
@@ -142,7 +153,7 @@ class cBinaryFile:
         bytes.reverse()
         self.ungetted.extend(bytes)
 
-class cPDFDate:
+class cPDFDate(object):
     def __init__(self):
         self.state = 0
 
@@ -210,13 +221,13 @@ class cPDFDate:
                     return None
 
 def fEntropy(countByte, countTotal):
-    x = float(countByte) / countTotal
+    x = old_div(float(countByte), countTotal)
     if x > 0:
         return - x * math.log(x, 2)
     else:
         return 0.0
 
-class cEntropy:
+class cEntropy(object):
     def __init__(self):
         self.allBucket = [0 for i in range(0, 256)]
         self.streamBucket = [0 for i in range(0, 256)]
@@ -231,13 +242,13 @@ class cEntropy:
             self.streamBucket[byte] -= 1
 
     def calc(self):
-        self.nonStreamBucket = map(operator.sub, self.allBucket, self.streamBucket)
+        self.nonStreamBucket = list(map(operator.sub, self.allBucket, self.streamBucket))
         allCount = sum(self.allBucket)
         streamCount = sum(self.streamBucket)
         nonStreamCount = sum(self.nonStreamBucket)
-        return (allCount, sum(map(lambda x: fEntropy(x, allCount), self.allBucket)), streamCount, sum(map(lambda x: fEntropy(x, streamCount), self.streamBucket)), nonStreamCount, sum(map(lambda x: fEntropy(x, nonStreamCount), self.nonStreamBucket)))
+        return (allCount, sum([fEntropy(x, allCount) for x in self.allBucket]), streamCount, sum([fEntropy(x, streamCount) for x in self.streamBucket]), nonStreamCount, sum([fEntropy(x, nonStreamCount) for x in self.nonStreamBucket]))
 
-class cPDFEOF:
+class cPDFEOF(object):
     def __init__(self):
         self.token = ''
         self.cntEOFs = 0
@@ -303,7 +314,7 @@ def HexcodeName2String(hexcodeName):
     return ''.join(map(Hexcode2String, hexcodeName))
 
 def SwapName(wordExact):
-    return map(SwapCase, wordExact)
+    return list(map(SwapCase, wordExact))
 
 def UpdateWords(word, wordExact, slash, words, hexcode, allNames, lastName, insideStream, oEntropy, fOut):
     if word != '':
@@ -334,7 +345,7 @@ def UpdateWords(word, wordExact, slash, words, hexcode, allNames, lastName, insi
                 fOut.write(C2BIP3(HexcodeName2String(wordExact)))
     return ('', [], False, lastName, insideStream)
 
-class cCVE_2009_3459:
+class cCVE_2009_3459(object):
     def __init__(self):
         self.count = 0
 
@@ -635,12 +646,12 @@ def PDFiD2String(xmlDoc, force):
         result += ' Entropy outside streams: %s (%10s bytes)\n' % (xmlDoc.documentElement.getAttribute('NonStreamEntropy'), xmlDoc.documentElement.getAttribute('NonStreamCount'))
     return result
 
-class cCount():
+class cCount(object):
     def __init__(self, count, hexcode):
         self.count = count
         self.hexcode = hexcode
 
-class cPDFiD():
+class cPDFiD(object):
     def __init__(self, xmlDoc, force):
         self.version = xmlDoc.documentElement.getAttribute('Version')
         self.filename = xmlDoc.documentElement.getAttribute('Filename')
@@ -822,7 +833,7 @@ def File2Strings(filename):
     except:
         return None
     try:
-        return list(map(lambda line:line.rstrip('\n'), f.readlines()))
+        return list([line.rstrip('\n') for line in f.readlines()])
     except:
         return None
     finally:
@@ -844,16 +855,16 @@ def AddPlugin(cClass):
     plugins.append(cClass)
 
 def ExpandFilenameArguments(filenames):
-    return list(collections.OrderedDict.fromkeys(sum(map(glob.glob, sum(map(ProcessAt, filenames), [])), [])))
+    return list(collections.OrderedDict.fromkeys(sum(list(map(glob.glob, sum(list(map(ProcessAt, filenames)), []))), [])))
 
-class cPluginParent():
+class cPluginParent(object):
     onlyValidPDF = True
 
 def LoadPlugins(plugins, verbose):
     if plugins == '':
         return
     scriptPath = os.path.dirname(sys.argv[0])
-    for plugin in sum(map(ProcessAt, plugins.split(',')), []):
+    for plugin in sum(list(map(ProcessAt, plugins.split(','))), []):
         try:
             if not plugin.lower().endswith('.py'):
                 plugin += '.py'

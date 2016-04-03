@@ -1,3 +1,4 @@
+from builtins import str
 import tempfile
 import os
 import hashlib

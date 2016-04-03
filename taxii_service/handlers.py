@@ -1,3 +1,4 @@
+from builtins import str
 import cgi
 import logging
 import os
@@ -675,7 +676,7 @@ def import_content_blocks(block_ids, action, analyst):
         pids[block.poll_time] = 1 # save unique poll timestamps
 
     if action == "import_delete":
-        taxii.TaxiiContent.objects(poll_time__in=pids.keys(), errors=[]).delete()
+        taxii.TaxiiContent.objects(poll_time__in=list(pids.keys()), errors=[]).delete()
 
     ret.update(tlos) # add the TLO lists to the return dict
 
@@ -1563,7 +1564,7 @@ def update_taxii_server_config(updates, analyst):
 
     try:
         service.save(username=analyst)
-    except ValidationError, e:
+    except ValidationError as e:
         result['message'] = e
         return result
 
@@ -1678,11 +1679,11 @@ def import_standards_doc(data, analyst, method, ref=None, make_event=False,
         parser = STIXParser(data, analyst, method, preview_only)
         parser.parse_stix(reference=ref, make_event=make_event, source=source)
         parser.relate_objects()
-    except STIXParserException, e:
+    except STIXParserException as e:
         logger.exception(e)
         ret['reason'] = str(e.message)
         return ret
-    except Exception, e:
+    except Exception as e:
         logger.exception(e)
         ret['reason'] = str(e)
         return ret

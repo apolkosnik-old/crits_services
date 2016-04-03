@@ -2,6 +2,7 @@
 Example Usage:
     python get_md5s.py -f "{'source.name': 'foo'}"
 """
+from __future__ import print_function
 
 import ast
 from optparse import OptionParser
@@ -34,7 +35,7 @@ class CRITsScript(CRITsBaseScript):
             for item in md5_list:
                 try:
                     if item['md5'] != None:
-                        print item['md5']
+                        print(item['md5'])
                 except:
                     pass
         except:

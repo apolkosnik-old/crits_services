@@ -1,11 +1,14 @@
+from __future__ import absolute_import
+from builtins import range
+from builtins import object
 import struct
 import binascii
 from datetime import datetime
 from pprint import pprint
-import extra_field_parse
+from . import extra_field_parse
 
 #Parse Zip Central Directory
-class ZipParser():
+class ZipParser(object):
 
     zipLDMagic = "\x50\x4b\x03\x04" #Local Directory
     zipCDMagic = "\x50\x4b\x01\x02" #Central Directory
@@ -27,7 +30,7 @@ class ZipParser():
             blockMagic = extraField[0:2]
             blockSize = struct.unpack("<H", extraField[2:4])[0]
             efBlock = extraField[:4+blockSize]
-            if blockMagic in efMappings.keys():
+            if blockMagic in list(efMappings.keys()):
                 #Mapping Header Is known (may or may not have been parsed)
                 parser = efMappings[blockMagic]["parseField"]()
                 parsedExtraField.append(parser.parse(efBlock,self.zip64Flag))
@@ -111,7 +114,7 @@ class ZipParser():
         2:    "control field records precede logical records",  #pkware reserved
         3:    "unused"
         }
-        if bit in xrange(3,16):
+        if bit in range(3,16):
             return internalNames[3]
         elif bit in internalNames:
             return internalNames[bit]
@@ -121,7 +124,7 @@ class ZipParser():
     def getInternalAttributes(self):
         internalAttributes = struct.unpack("<H",self.centralDirectory[36:38])[0]
         setAttributes = []
-        for bit in xrange(0,16):
+        for bit in range(0,16):
             if internalAttributes & (2**bit) > 0:
                 setAttributes.append(self.getInternalAttributeNames(bit))
         if not setAttributes:
@@ -206,7 +209,7 @@ class ZipParser():
     def getFlags(self):
         flags = struct.unpack("<H",self.centralDirectory[8:10])[0]
         setFlags = []
-        for i in xrange(0,16):
+        for i in range(0,16):
         	if (flags & (2**i)):
         		setFlags.append(self.getFlagNames(i))
         if not setFlags:
@@ -240,7 +243,7 @@ class ZipParser():
         19  :"OS/X (Darwin)",
         20  :"unused",
         }
-        if highByte in xrange(20,256):
+        if highByte in range(20,256):
             return versionNameDict[20]
         elif highByte in versionNameDict:
             return versionNameDict[highByte]

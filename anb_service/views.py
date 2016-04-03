@@ -16,7 +16,7 @@ def get_anb_data(request, ctype, cid):
 
     data = handlers.execute_anb(ctype, cid, sources)
     # If any of the values are not an empty string we have data.
-    for v in data.values():
+    for v in list(data.values()):
         if v != "":
             result['success'] = "true"
             result['message'] = data

@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 import logging
 import pydeep
 
@@ -29,7 +31,7 @@ class SSDeepService(Service):
         else:     
             data = {}
             fields = forms.SSDeepRunForm().fields
-            for name, field in fields.iteritems():
+            for name, field in fields.items():
                 data[name] = field.initial
         return forms.SSDeepRunForm(data)
 
@@ -65,7 +67,7 @@ class SSDeepService(Service):
         query_filter["$or"] = []
         query_filter["$or"].append({"ssdeep": {"$regex": "^%d:" % chunk_size * 2}})
         query_filter["$or"].append({"ssdeep": {"$regex": "^%d:" % chunk_size}})
-        query_filter["$or"].append({"ssdeep": {"$regex": "^%d:" % (chunk_size / 2)}})
+        query_filter["$or"].append({"ssdeep": {"$regex": "^%d:" % (old_div(chunk_size, 2))}})
         result_filter = {'md5': 1, 'ssdeep': 1}
         candidate_space = Sample.objects(__raw__=query_filter).only(*result_filter)
         match_list = []

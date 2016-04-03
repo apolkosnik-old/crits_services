@@ -1,3 +1,4 @@
+from __future__ import print_function
 from stix.core import STIXPackage
 from crits.standards.parsers import STIXParser
 from crits.core.basescript import CRITsBaseScript
@@ -24,7 +25,7 @@ class CRITsScript(CRITsBaseScript):
         (opts, args) = parser.parse_args(argv)
 
         if not opts.infile:
-            print "Need a file to parse."
+            print("Need a file to parse.")
             return
 
         f = open(opts.infile, 'r')
@@ -34,9 +35,9 @@ class CRITsScript(CRITsBaseScript):
         ret = import_standards_doc(data, "Command Line", "Standards Import Script", make_event=opts.event, source=opts.source)
         if ret['success']:
             for k in ["events", "samples", "emails", "indicators"]:
-                print "%s (%i)" % (k, len(ret[k]))
+                print("%s (%i)" % (k, len(ret[k])))
                 if opts.verbose:
                     for i in ret[k]:
-                        print "\t" + i
+                        print("\t" + i)
         else:
-            print "Failure: %s" % ret['reason']
+            print("Failure: %s" % ret['reason'])

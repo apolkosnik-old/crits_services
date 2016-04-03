@@ -1,10 +1,13 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 # Copyright (c) 2015, The MITRE Corporation. All rights reserved.
 
 # Source code distributed pursuant to license agreement.
 
 import hashlib
 import logging
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import hmac
 
 from django.conf import settings
@@ -33,12 +36,12 @@ class TotalHashService(Service):
     def get_config(existing_config):
         config = {}
         fields = forms.TotalHashConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -79,15 +82,15 @@ class TotalHashService(Service):
 
         signature = hmac.new(key, msg=h, digestmod=hashlib.sha256).hexdigest()
         params = "/analysis/" + h + "&id=" + user + "&sign=" + signature
-        req = urllib2.Request(url + params)
+        req = urllib.request.Request(url + params)
 
         if settings.HTTP_PROXY:
-            proxy = urllib2.ProxyHandler({'https': settings.HTTP_PROXY})
-            opener = urllib2.build_opener(proxy)
-            urllib2.install_opener(opener)
+            proxy = urllib.request.ProxyHandler({'https': settings.HTTP_PROXY})
+            opener = urllib.request.build_opener(proxy)
+            urllib.request.install_opener(opener)
 
         try:
-            response = urllib2.urlopen(req)
+            response = urllib.request.urlopen(req)
             data = response.read()
         except Exception as e:
             logger.info("Totalhash: network connection error (%s)" % e)

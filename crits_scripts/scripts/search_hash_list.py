@@ -1,3 +1,4 @@
+from __future__ import print_function
 from optparse import OptionParser
 
 import settings
@@ -41,4 +42,4 @@ class CRITsScript(CRITsBaseScript):
                 fout.close()
             else:
                 for result in results:
-                    print result
+                    print(result)

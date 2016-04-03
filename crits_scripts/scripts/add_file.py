@@ -1,3 +1,4 @@
+from __future__ import print_function
 from optparse import OptionParser
 import hashlib
 import os
@@ -33,10 +34,10 @@ class CRITsScript(CRITsBaseScript):
         if opts.source:
             source = opts.source
         else:
-            print "[-] Source required, none provided"
+            print("[-] Source required, none provided")
             return
         if opts.parent_md5 and opts.parent_id:
-            print "[-] Specify one of -p or -i!"
+            print("[-] Specify one of -p or -i!")
             return
         try:
             fin = open(opts.filename, 'rb')
@@ -44,9 +45,9 @@ class CRITsScript(CRITsBaseScript):
             fin.close()
             md5hash.update(data)
             sourcemd5 = md5hash.hexdigest()
-            print "[+] Read %d from %s" % (len(data), opts.filename)
+            print("[+] Read %d from %s" % (len(data), opts.filename))
         except:
-            print "[-] Cannot open %s for reading!" % opts.filename
+            print("[-] Cannot open %s for reading!" % opts.filename)
             return
         if opts.parent_md5:
             parent_md5 = opts.parent_md5
@@ -76,6 +77,6 @@ class CRITsScript(CRITsBaseScript):
             method="Command line add_file.py",
             bucket_list=opts.bucket_list)
         if sourcemd5 != sample:
-            print "[-] Source MD5: %s is not the same as the returned MD5: %s" % (sourcemd5, sample)
+            print("[-] Source MD5: %s is not the same as the returned MD5: %s" % (sourcemd5, sample))
         else:
-            print "[+] Added %s (MD5: %s)" % (filename, sample)
+            print("[+] Added %s (MD5: %s)" % (filename, sample))

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from optparse import OptionParser
 
 from crits.core.basescript import CRITsBaseScript
@@ -29,30 +30,30 @@ class CRITsScript(CRITsBaseScript):
         (opts, args) = parser.parse_args(argv)
 
         if not opts.host:
-            print "[+] Using host from service configuration."
+            print("[+] Using host from service configuration.")
         if not opts.keyfile:
-            print "[+] Using keyfile from service configuration."
+            print("[+] Using keyfile from service configuration.")
         if not opts.certfile:
-            print "[+] Using certfile from service configuration."
+            print("[+] Using certfile from service configuration.")
         if not opts.feed:
-            print "[+] Using feed from service configuration."
+            print("[+] Using feed from service configuration.")
         if opts.https:
-            print "[+] Connecting over HTTPS."
+            print("[+] Connecting over HTTPS.")
 
         objs = execute_taxii_agent(opts.host, opts.https, opts.feed,
                                    opts.keyfile, opts.certfile, opts.start,
                                    opts.end, analyst="Command Line",
                                    method="TAXII Agent")
         if not objs['status']:
-            print "Failure: %s" % objs['reason']
+            print("Failure: %s" % objs['reason'])
             return
 
-        print "Failed content blocks: %i" % objs["failures"]
-        print "Successful content blocks: %i" % objs["successes"]
+        print("Failed content blocks: %i" % objs["failures"])
+        print("Successful content blocks: %i" % objs["successes"])
 
         if  objs["successes"] > 0:
             for k in ["events", "samples", "emails", "indicators"]:
-                print "%s (%i)" % (k, len(objs[k]))
+                print("%s (%i)" % (k, len(objs[k])))
                 if opts.verbose:
                     for i in objs[k]:
-                        print i
+                        print(i)

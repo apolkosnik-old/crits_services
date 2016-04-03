@@ -2,6 +2,8 @@
 Example Usage:
     python get_emails.py -f "{'from': 'example@foo.com'}"
 """
+from __future__ import print_function
+from builtins import str
 
 import ast
 from optparse import OptionParser
@@ -59,6 +61,6 @@ class CRITsScript(CRITsBaseScript):
                                 )
             if data:
                 pathname = os.path.join(path, email_id + "." + meta_format)
-                print "[+] Writing %s" % pathname
+                print("[+] Writing %s" % pathname)
                 with open(pathname, "wb") as f:
                     f.write(data)

@@ -1,5 +1,8 @@
-import urllib
-from urlparse import (
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+import urllib.request, urllib.parse, urllib.error
+from urllib.parse import (
     urlparse,
     parse_qsl
 )
@@ -83,7 +86,7 @@ def submit_query(request, url, type_, params=None):
             url = url + "&access_token=" + access_token.get_access_token()
         try:
             results = Broker.get(url)
-        except pytxFetchError, e:
+        except pytxFetchError as e:
             return {'success': False,
                     'message': e.message['message']}
     if type_ == "Threat Descriptors":
@@ -114,15 +117,15 @@ def submit_query(request, url, type_, params=None):
         return {'success': False,
                 'message': "Invalid Type"}
     if url is None:
-        for k, v in params.iteritems():
+        for k, v in params.items():
             if len(params[k]) < 1 or params[k] == '':
                 params[k] = None
         try:
             results = klass.objects(full_response=True, fields=klass._fields, **params)
-        except pytxFetchError, e:
+        except pytxFetchError as e:
             return {'success': False,
                     'message': e.message['message']}
-        except Exception, e:
+        except Exception as e:
             return {'success': False,
                     'message': str(e)}
     data = results.get('data', None)
@@ -131,7 +134,7 @@ def submit_query(request, url, type_, params=None):
         params = dict(parse_qsl(urlparse(next_url).query, keep_blank_values=True))
         if 'access_token' in params:
             del params['access_token']
-        next_url = next_url.split('?')[0] + "/?"+ urllib.urlencode(params)
+        next_url = next_url.split('?')[0] + "/?"+ urllib.parse.urlencode(params)
     html = ''
     if data:
         for d in data:
@@ -177,7 +180,7 @@ def get_members():
     setup_access()
     try:
         members = ThreatExchangeMember.objects(full_response=True)
-    except pytxFetchError, e:
+    except pytxFetchError as e:
         return {'success': False,
                 'message': e.message.message}
     mlist = members.get('data', [])
@@ -211,7 +214,7 @@ def get_groups():
 
 def get_class_attribute_values(klass):
     result = []
-    for k,v in klass.__dict__.iteritems():
+    for k,v in klass.__dict__.items():
         if not k.startswith('__') and not k.endswith('__'):
             result.append(v)
     return sorted(result)
@@ -245,7 +248,7 @@ def export_object(request, type_, id_, params):
                                    request.user.username, note=note)
         return {'success': True,
                 'results': result}
-    except pytxFetchError, e:
+    except pytxFetchError as e:
         return {'success': False,
                 'message': e.message['message']}
 

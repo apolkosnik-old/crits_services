@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import range
 import logging
 import json
 
@@ -348,6 +350,6 @@ def taxii_service_context(request):
         user = request.user.username
         try:
             context['upload_standards'] = forms.UploadStandardsForm(user)
-        except Exception, e:
+        except Exception as e:
             logger.warning("Base Context UploadStandardsForm Error: %s" % e)
     return context

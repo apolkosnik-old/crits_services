@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 from distutils.version import StrictVersion
 
 import tempfile
@@ -118,7 +120,7 @@ def chopshop_carver(pcap_md5, options, analyst):
     message = ''
 
     # Grab any carved HTTP bodies.
-    for (md5_digest, (name, blob)) in chopui.jsonclass.http_files.items():
+    for (md5_digest, (name, blob)) in list(chopui.jsonclass.http_files.items()):
         if handle_file(name, blob, source, related_md5=pcap_md5, user=analyst, method='ChopShop Filecarver', md5_digest=md5_digest, related_type='PCAP'):
             # Specifically not using name here as I don't want to deal
             # with sanitizing it
@@ -127,19 +129,19 @@ def chopshop_carver(pcap_md5, options, analyst):
             message += "Failed to save file %s." % md5_digest
 
     # Grab any carved SMTP returns.
-    for blob in chopui.jsonclass.smtp_returns.values():
+    for blob in list(chopui.jsonclass.smtp_returns.values()):
         ret = handle_eml(blob, source, None, analyst, 'ChopShop FileCarver', 'PCAP', pcap.id)
         if not ret['status']:
             message += ret['reason']
             continue
 
-        message += "Saved email: <a href=\"%s\">%s</a><br />%i attachment(s)<br />" % (reverse('crits.emails.views.email_detail', args=[ret['object'].id]), ret['object'].id, len(ret['attachments'].keys()))
+        message += "Saved email: <a href=\"%s\">%s</a><br />%i attachment(s)<br />" % (reverse('crits.emails.views.email_detail', args=[ret['object'].id]), ret['object'].id, len(list(ret['attachments'].keys())))
 
-        for md5_digest in ret['attachments'].keys():
+        for md5_digest in list(ret['attachments'].keys()):
             message += "<a href=\"%s\">%s</a><br />" % (reverse('crits.samples.views.detail', args=[md5_digest]), md5_digest)
 
     # Handle raw returns.
-    for id_, blob in chopui.jsonclass.raw_returns.items():
+    for id_, blob in list(chopui.jsonclass.raw_returns.items()):
         md5_digest = handle_file(id_, blob, source, related_md5=pcap_md5, user=analyst, method='ChopShop Filecarver', related_type='PCAP')
         if md5_digest:
             message += "Saved raw %s: <a href=\"%s\">%s</a><br />" % (id_, reverse('crits.samples.views.detail', args=[md5_digest]), md5_digest)
@@ -152,7 +154,7 @@ def chopshop_carver(pcap_md5, options, analyst):
         message = 'No files found.'
     return {'success': True, 'message': message}
 
-class jsonhandler:
+class jsonhandler(object):
     def __init__(self, ui_stop_fn=None, lib_stop_fn=None, format_string=None):
         self.service = None
         self.http_files = {} # Key is the MD5, value is a tuple (name, data)

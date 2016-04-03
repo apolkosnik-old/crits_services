@@ -22,7 +22,7 @@ def query(request):
 @user_passes_test(user_can_view_data)
 def get_threat_types(request):
     if request.method == "POST" and request.is_ajax():
-        threat_types = {k:v for k,v in tt.__dict__.items() if not k.startswith('__') and not callable(k)}
+        threat_types = {k:v for k,v in list(tt.__dict__.items()) if not k.startswith('__') and not callable(k)}
 
         return HttpResponse(json.dumps(threat_types),
                             content_type="application/json")
@@ -34,7 +34,7 @@ def get_threat_types(request):
 @user_passes_test(user_can_view_data)
 def get_sample_types(request):
     if request.method == "POST" and request.is_ajax():
-        sample_types = {k:v for k,v in mat.__dict__.items() if not k.startswith('__') and not callable(k)}
+        sample_types = {k:v for k,v in list(mat.__dict__.items()) if not k.startswith('__') and not callable(k)}
         return HttpResponse(json.dumps(sample_types),
                             content_type="application/json")
     else:

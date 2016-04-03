@@ -1,10 +1,16 @@
+from __future__ import absolute_import
+from __future__ import division
+from builtins import chr
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import hashlib
 import logging
 
 from crits.services.core import Service, ServiceConfigError
 
-import pdfparser
-import pdfid
+from . import pdfparser
+from . import pdfid
 import math
 import re
 import json
@@ -39,7 +45,7 @@ class PDFInfoService(Service):
             return 0
         entropy = 0
         for x in range(256):
-            p_x = float(data.count(chr(x)))/len(data)
+            p_x = old_div(float(data.count(chr(x))),len(data))
             if p_x > 0:
                 entropy += - p_x*math.log(p_x, 2)
         return entropy

@@ -1,10 +1,13 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
 from django.core.urlresolvers import reverse
 from mongoengine import Document
 from tastypie import authorization
 from tastypie.authentication import MultiAuthentication
 from tastypie.exceptions import BadRequest
 
-from handlers import import_standards_doc
+from .handlers import import_standards_doc
 from crits.core.api import CRITsApiKeyAuthentication, CRITsSessionAuthentication
 from crits.core.api import CRITsSerializer, CRITsAPIResource
 from crits.core.crits_mongoengine import CritsDocument
@@ -22,7 +25,7 @@ class StandardsResource(CRITsAPIResource):
     Currently supports  POST.
     """
 
-    class Meta:
+    class Meta(object):
         object_class = StandardsObject
         allowed_methods = ('post',)
         resource_name = "standards"

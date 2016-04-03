@@ -1,3 +1,4 @@
+from builtins import str
 # (c) 2015, Adam Polkosnik <adam.polkosnik@ny.frb.org>
 #
 import logging

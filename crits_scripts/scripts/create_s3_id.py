@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 import os
 
 from crits.core.basescript import CRITsBaseScript
@@ -44,4 +46,4 @@ class CRITsScript(CRITsBaseScript):
 
     def run(self, argv):
         id = create_id()
-        print id
+        print(id)

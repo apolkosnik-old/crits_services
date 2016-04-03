@@ -1,3 +1,4 @@
+from builtins import str
 import logging
 import os
 import re
@@ -104,7 +105,7 @@ class TAXIIClient(Service):
 
         # Rename keys so they render nice.
         fields = forms.TAXIIServiceConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             # Convert sigfiles to newline separated strings
             if name == 'taxii_servers':
                 display_config[field.label] = ', '.join(config[name])
@@ -147,14 +148,14 @@ class TAXIIClient(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.TAXIIServiceConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
             if 'hostname' in existing_config: # then migrate old style config
                 existing_config = self.migrate_config(existing_config)
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 

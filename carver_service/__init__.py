@@ -1,3 +1,4 @@
+from builtins import str
 import hashlib
 
 from django.template.loader import render_to_string
@@ -33,7 +34,7 @@ class CarverService(Service):
         else:
             data = {}
             fields = forms.CarverRunForm().fields
-            for name, field in fields.iteritems():
+            for name, field in fields.items():
                 data[name] = field.initial
         return forms.CarverRunForm(data)
 

@@ -45,12 +45,12 @@ class ExiftoolService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.ExiftoolConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -83,5 +83,5 @@ class ExiftoolService(Service):
 
             # exiftool will return its results in json, and it will be inside a single element list
             results = json.loads(output.decode('utf-8'))[0]
-            for key,value in results.items():
+            for key,value in list(results.items()):
                 self._add_result("Metadata", key, {'Value': value})

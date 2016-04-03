@@ -1,4 +1,7 @@
 #!/usr/bin/python
+from __future__ import print_function
+from builtins import str
+from builtins import range
 __description__ = '%prog - extracts payload and metadata from a Symantec Local Quarantine files'
 __author__ = 'Adam Polkosnik <adam.polkosnik@ny.frb.org> <apolkosnik@gmail.com>'
 __date__ = '2015-04-08'
@@ -57,7 +60,7 @@ def ExtractPayloads(data):
                 next_one = hash_start+12+ hash_size
                 #print("hash_size: %d" % hash_size)
                 #print ("next one: %s" % binascii.hexlify(data5a[next_one:next_one+8]))
-            	sample_size_off= next_one + 15
+                sample_size_off= next_one + 15
             #print ("sample_size_off: %s" % binascii.hexlify(data5a[sample_size_off:sample_size_off+8])) 
             sample_size = unpack('<Q',data5a[(sample_size_off):(sample_size_off+8)])[0]
             

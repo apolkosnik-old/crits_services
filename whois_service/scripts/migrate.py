@@ -1,3 +1,4 @@
+from __future__ import print_function
 import ast
 from optparse import OptionParser
 
@@ -27,11 +28,11 @@ class CRITsScript(CRITsBaseScript):
 
         if opts.domain:
             if opts.verbose:
-                print "[+] Using domain: %s" % opts.domain
+                print("[+] Using domain: %s" % opts.domain)
             domain = opts.domain
         else:
             if opts.verbose:
-                print "[+] Using ALL domains"
+                print("[+] Using ALL domains")
             domain = None
 
         config = {}
@@ -39,10 +40,10 @@ class CRITsScript(CRITsBaseScript):
             config = ast.literal_eval(opts.config)
 
         if not config:
-            print "No config provided, defaulting to live only."
+            print("No config provided, defaulting to live only.")
             config['live_query'] = True
         else:
-            print "Using config: %s" % config
+            print("Using config: %s" % config)
 
         query = {
                   '$or': [
@@ -67,7 +68,7 @@ class CRITsScript(CRITsBaseScript):
 
         doms = Domain.objects(__raw__=query)
         for dom in doms:
-            print "Executing whois for %s" % dom.domain
+            print("Executing whois for %s" % dom.domain)
             if opts.dry_run:
                 continue
             try:
@@ -79,6 +80,6 @@ class CRITsScript(CRITsBaseScript):
                                      custom_config=config)
                 dom.save()
             except ServiceAnalysisError as e:
-                print "Service error: %s" % e
+                print("Service error: %s" % e)
             except ValidationError as e:
-                print "Validation error: %s" % e
+                print("Validation error: %s" % e)

@@ -1,9 +1,12 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import logging
 import os
 import hashlib
-import urllib
-import urllib2
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 
 from hashlib import md5
 
@@ -40,12 +43,12 @@ class MalShareService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.MalShareConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -79,19 +82,19 @@ class MalShareService(Service):
         #Download URL: https://malshare.com/api.php?api_key=[API_KEY]&action=getfile&hash=[HASH]
 
         parameters = {"api_key": key, "action": "getfile", "hash": obj.md5}
-        data = urllib.urlencode(parameters)
-        req = urllib2.Request("http://malshare.com/api.php", data)
+        data = urllib.parse.urlencode(parameters)
+        req = urllib.request.Request("http://malshare.com/api.php", data)
 
         logger.info("Connecting MalShare to download sample")
         self._info("Connecting MalShare to download sample")
 
         # Execute GET request
         if settings.HTTP_PROXY:
-            proxy = urllib2.ProxyHandler({'http': settings.HTTP_PROXY})
-            opener = urllib2.build_opener(proxy)
-            urllib2.install_opener(opener)
+            proxy = urllib.request.ProxyHandler({'http': settings.HTTP_PROXY})
+            opener = urllib.request.build_opener(proxy)
+            urllib.request.install_opener(opener)
         try:
-            response = urllib2.urlopen(req)
+            response = urllib.request.urlopen(req)
             sample_file = response.read()
         except Exception as e:
             logger.error("MalShare: network connection error (%s)" % e)

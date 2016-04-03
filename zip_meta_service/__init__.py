@@ -1,5 +1,7 @@
+from __future__ import absolute_import
+from builtins import str
 from crits.services.core import Service, ServiceConfigError
-from zip_meta import ZipParser
+from .zip_meta import ZipParser
 
 class ZipMetaService(Service):
     """
@@ -34,7 +36,7 @@ class ZipMetaService(Service):
             self._error("Could not parse document as a zip file")
             return
         for cd in parsedZip:
-            for name,value in cd.iteritems():
+            for name,value in cd.items():
                 if name == 'ZipExtraField':
                     continue
                 name = {"Name" : name}
@@ -48,14 +50,14 @@ class ZipMetaService(Service):
             if cd["ZipExtraField"]:
                 for dictionary in cd["ZipExtraField"]:
                     if dictionary["Name"] == "UnknownHeader":
-                        for name,value in dictionary.iteritems():
+                        for name,value in dictionary.items():
                             name = {"Name" : name}
                             if name == "Data":
                                 self._add_result(dictionary["Name"], name, name)
                             else:
                                 self._add_result(dictionary["Name"], str(value), name)
                     else:
-                        for name,value in dictionary.iteritems():
+                        for name,value in dictionary.items():
                             name = {"Name" : name}
                             self._add_result(dictionary["Name"], str(value), name)
             else:

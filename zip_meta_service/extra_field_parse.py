@@ -1,8 +1,11 @@
+from builtins import str
+from builtins import range
+from builtins import object
 import struct
 from datetime import datetime,timedelta
 import binascii
 
-class HeaderIdMapping():
+class HeaderIdMapping(object):
     #More classes can be created if needed and if available. Note that some
     #extra field breakdowns were unable to be found.
     def HeaderIds(self):
@@ -83,7 +86,7 @@ class HeaderIdMapping():
     def __init__(self):
         self.HeaderIds()
 
-class TimeAdjust():
+class TimeAdjust(object):
 
     def convertTime(self,time):
         #days between Unix epoch and NTFS epoch are 134,774
@@ -96,7 +99,7 @@ class TimeAdjust():
     def __init__(self):
         pass
 
-class NTFS():  #Same For Local Directory
+class NTFS(object):  #Same For Local Directory
     #probably a better way to write this function...
     def parse(self,extraField, _zip64Flag):
         timeAjduster = TimeAdjust()
@@ -127,7 +130,7 @@ class NTFS():  #Same For Local Directory
     def __init__(self):
         pass
 
-class Unix():
+class Unix(object):
 
     def parse(self,extraField,_zip64Flag):
         timeAdjuster = TimeAdjust()
@@ -148,7 +151,7 @@ class Unix():
     def __init__(self):
         pass
 
-class Unix2():
+class Unix2(object):
 
     def parse(self,extraField,_zip64Flags):
         parsedBlock = {
@@ -160,7 +163,7 @@ class Unix2():
         }
         return parsedBlock
 
-class InfoZipUnixOld():
+class InfoZipUnixOld(object):
 
     def parse(self,extraField,_zip64Flag):
         timeAdjuster = TimeAdjust()
@@ -180,7 +183,7 @@ class InfoZipUnixOld():
     def __init__(self):
         pass
 
-class InfoZipUnixNew():
+class InfoZipUnixNew(object):
 
     def parse(self,extraField,_zip64Flags):
         parsedBlock = {
@@ -202,7 +205,7 @@ class InfoZipUnixNew():
     def __init__(self):
         pass
 
-class ExtendedTimeStamp():
+class ExtendedTimeStamp(object):
 
     def parse(self, extraField, _zip64Flag):
         setBits = []
@@ -212,7 +215,7 @@ class ExtendedTimeStamp():
         "TSize"      :struct.unpack("<H", extraField[2:4])[0],
         "Flags"      :struct.unpack("<B",extraField[4:5])[0]
         }
-        for i in xrange (0,8):
+        for i in range (0,8):
             if parsedBlock["Flags"] & (2**i) > 0:
                 if i == 0:
                     MTime = True
@@ -250,7 +253,7 @@ class ExtendedTimeStamp():
     def __init__(self):
         pass
 
-class WindowsNTSecurityDescriptor():
+class WindowsNTSecurityDescriptor(object):
 
     def parse(self, extraField, _zip64Flag):
         parsedBlock = {
@@ -269,7 +272,7 @@ class WindowsNTSecurityDescriptor():
     def __init__(self):
         pass
 
-class Zip64Extended():
+class Zip64Extended(object):
 
     def parse(self, extraField, zip64Flags):
     #Zip64 Flags are true if data could not fit in Central Directory Bytes
@@ -298,7 +301,7 @@ class Zip64Extended():
     def __init__(self):
         pass
 
-class OS2():
+class OS2(object):
 
     def parse(self, extraField, _zip64Flag):
         parsedBlock = {
@@ -315,7 +318,7 @@ class OS2():
     def __init__(self):
         pass
 
-class OS2ACL():
+class OS2ACL(object):
 
     def parse(self,extraField,_zip64Flags):
         parsedBlock = {
@@ -339,7 +342,7 @@ class OS2ACL():
     def __init__(self):
             pass
 
-class ASiUnix():
+class ASiUnix(object):
 
     def parse(self,extraField,_zip64Flags):
         parsedBlock = {
@@ -359,7 +362,7 @@ class ASiUnix():
     def __init__(self):
         pass
 
-class UnknownExtraField ():
+class UnknownExtraField(object):
 
     def parse(self, extraField, _zip64Flag):
         parsedBlock = {

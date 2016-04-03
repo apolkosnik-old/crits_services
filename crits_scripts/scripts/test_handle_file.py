@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from builtins import object
 from django.conf import settings
 
 from crits.services.analysis_result import AnalysisResult
@@ -30,18 +33,18 @@ class TestFile(object):
         self.samples = mongo_connector(settings.COL_SAMPLES)
         self.grid = mongo_connector("%s.files" % settings.COL_SAMPLES)
         self._clean()
-        print "[+] Initializing with fn='%s', source='%s'" % (self.test_filename,
-                                                              self.sources)
+        print("[+] Initializing with fn='%s', source='%s'" % (self.test_filename,
+                                                              self.sources))
 
     def _clean(self):
         self._del_sample()
 
     def _upload_file(self):
-        print "[+] calling handle_file with file data"
+        print("[+] calling handle_file with file data")
         handle_file(self.test_filename, self.test_data, self.sources[0])
 
     def _upload_md5(self):
-        print "[+] calling handle_file with md5_digest"
+        print("[+] calling handle_file with md5_digest")
         handle_file(self.test_filename, data='', source=self.sources[0],
                     md5_digest = self.test_md5)
 
@@ -51,20 +54,20 @@ class TestFile(object):
     def _del_sample(self):
         sample = Sample.objects(md5=self.test_md5).first()
         if sample:
-            print "[-] deleting from grid"
+            print("[-] deleting from grid")
             if sample.filedata:
                 sample.filedata.delete()
-            print "[-] deleting sample"
+            print("[-] deleting sample")
             sample.delete()
         else:
-            print "[-] could not find sample to delete"
+            print("[-] could not find sample to delete")
 
     def _del_grid(self):
-        print "[-] deleting from grid"
+        print("[-] deleting from grid")
         self.grid.remove({'md5': self.test_md5})
 
     def _add_grid(self):
-        print "[+] adding to gridfs"
+        print("[+] adding to gridfs")
         put_file(self.test_md5, self.test_data)
 
     def _check(self):
@@ -77,7 +80,7 @@ class TestFile(object):
         if sample and sample.filedata:
             if len(AnalysisResult.objects(object_id=str(sample.id))) > 0:
                 results = True
-        print "[?] sample analysis executed == %s" % results
+        print("[?] sample analysis executed == %s" % results)
         return results
 
     def _check_grid(self):
@@ -87,7 +90,7 @@ class TestFile(object):
             if sample.filedata:
                 data = sample.filedata.read()
                 result = data == self.test_data
-            print "[?] check grid == %s" % result
+            print("[?] check grid == %s" % result)
         return result
 
 class CRITsScript(CRITsBaseScript):
@@ -95,24 +98,24 @@ class CRITsScript(CRITsBaseScript):
         self.username = username
 
     def run(self, argv):
-        print "\r\n*** init, basic check ***"
+        print("\r\n*** init, basic check ***")
         new = TestFile()
         new._check()
-        print "*" * 40
+        print("*" * 40)
 
-        print "\r\n+++ del grid, upload md5, upload file +++"
+        print("\r\n+++ del grid, upload md5, upload file +++")
         new._del_grid()
         new._upload_md5()
         new._check()
         new._upload_file()
         new._check()
-        print "*" * 40
+        print("*" * 40)
 
-        print "\r\n+++ clean, add to grid, upload md5 +++"
+        print("\r\n+++ clean, add to grid, upload md5 +++")
         new._clean()
         new._check()
         new._add_grid()
         new._check()
         new._upload_md5()
         new._check()
-        print "*" * 40
+        print("*" * 40)

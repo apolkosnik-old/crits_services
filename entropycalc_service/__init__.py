@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 # (c) 2013, Adam Polkosnik, <adam.polkosnik@ny.frb.org>
 # Permission is granted for inclusion/distribution by The MITRE Corporation.
 # All rights reserved.
@@ -42,7 +44,7 @@ class EntropycalcService(Service):
         else:
             data = {}
             fields = forms.EntropyCalcRunForm().fields
-            for name, field in fields.iteritems():
+            for name, field in fields.items():
                 data[name] = field.initial
         return forms.EntropyCalcRunForm(data)
 
@@ -66,7 +68,7 @@ class EntropycalcService(Service):
 
         for x in occurences:
             if x:
-                p_x = Decimal(x) / len(data)
+                p_x = old_div(Decimal(x), len(data))
                 entropy -= p_x * Decimal(math.log(p_x, 2))
 
         return entropy

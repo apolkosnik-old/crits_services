@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 from crits.samples.sample import Sample
 from crits.core.user_tools import user_sources
 from snugglefish_service.snugglefish import SnuggleIndex
@@ -21,7 +24,7 @@ def snugglefish_status():
         del(tmp['query'])
         del(tmp['directory'])
         try:
-            tmp['percent'] = (float(sngindex.count)/sngindex.total) * 100
+            tmp['percent'] = (old_div(float(sngindex.count),sngindex.total)) * 100
         except:
             tmp['percent'] = 0
         ret.append(tmp)
@@ -58,7 +61,7 @@ def snugglefish_search(indexes, search, user):
             for res in tmp:
                 if Sample.objects(md5=res, source__name__in=sources).count() > 0:
                     ret[idx]['files'].append(res)
-        except Exception, e:
+        except Exception as e:
             ret[idx]['reason'] = "Error: %s" % e
             ret[idx]['success'] = False
     return ret

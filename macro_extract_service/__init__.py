@@ -1,3 +1,4 @@
+from builtins import str
 from oletools.olevba import (
     VBA_Parser
 )
@@ -35,7 +36,7 @@ class MacroExtractService(Service):
         filedata = obj.filedata.read()
         try:
             vbaparser = VBA_Parser(filename, data=filedata)
-        except Exception, e:
+        except Exception as e:
             self._error("Cannot parse file: %s" % str(e))
             return
         if vbaparser.detect_vba_macros():

@@ -1,3 +1,4 @@
+from builtins import object
 from tastypie import authorization
 from tastypie.exceptions import BadRequest
 from tastypie.authentication import MultiAuthentication
@@ -32,7 +33,7 @@ class RelationshipsServiceResource(CRITsAPIResource):
     Currently supports GET.
     """
 
-    class Meta:
+    class Meta(object):
         object_class = GraphObject
         allowed_methods = ('get',)
         resource_name = 'relationshipsservice'
@@ -65,7 +66,7 @@ class RelationshipsServiceResource(CRITsAPIResource):
         if types:
             types = types.split(',')
         else:
-            types = settings.CRITS_TYPES.keys()
+            types = list(settings.CRITS_TYPES.keys())
 
         if not ctype:
             raise BadRequest("Must specify CRITs type (ctype).")

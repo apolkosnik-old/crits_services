@@ -1,3 +1,6 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 # This code is a modified version of the example echo_wsh.py websocket handler
 # that comes with mod_pywebsocket for use as a CRITs service.
 #
@@ -35,7 +38,7 @@ import os
 import pexpect
 import sys
 import tempfile
-from urlparse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 
 from crits.core.user import CRITsUser
 from crits.samples.sample import Sample
@@ -155,7 +158,7 @@ def start_pyew_shell(request, id_, token):
         sample_name = temp_sample.name
         temp_sample.write(sample_data)
         temp_sample.close()
-    except Exception, e:
+    except Exception as e:
         text = "\nError writing file to disk: %s" % e
         request.ws_stream.send_message(base64.b64encode(text),
                                        binary=False)

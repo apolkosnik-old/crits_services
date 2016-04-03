@@ -1,4 +1,7 @@
-import urllib2
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import urllib.request, urllib.error, urllib.parse
 import xml.parsers.expat
 
 from datetime import datetime
@@ -28,12 +31,12 @@ class OPSWATService(Service):
     def get_config(existing_config):
         config = {}
         fields = forms.OPSWATConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -43,7 +46,7 @@ class OPSWATService(Service):
 
         # Rename keys so they render nice.
         fields = forms.OPSWATConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
 
         return display_config
@@ -73,17 +76,17 @@ class OPSWATService(Service):
         url = config.get('url', '')
         if config.get('use_proxy'):
             self._debug("OPSWAT: proxy handler set to: %s" % settings.HTTP_PROXY)
-            proxy_handler = urllib2.ProxyHandler({'http': settings.HTTP_PROXY})
+            proxy_handler = urllib.request.ProxyHandler({'http': settings.HTTP_PROXY})
         else:
             self._debug("OPSWAT: proxy handler unset")
-            proxy_handler = urllib2.ProxyHandler({})
-        opener = urllib2.build_opener(proxy_handler)
-        urllib2.install_opener(opener)
+            proxy_handler = urllib.request.ProxyHandler({})
+        opener = urllib.request.build_opener(proxy_handler)
+        urllib.request.install_opener(opener)
 
-        req = urllib2.Request(url)
+        req = urllib.request.Request(url)
         req.add_header("Content-Type", "application/zip")
         req.add_data(bytearray(zipdata))
-        out = urllib2.urlopen(req)
+        out = urllib.request.urlopen(req)
         text_out = out.read()
 
         # Parse XML output

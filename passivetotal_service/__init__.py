@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """PassiveTotal CRITS Service."""
+from builtins import str
 
 __author__ = 'Brandon Dixon (PassiveTotal)'
 __email__ = "admin@passivetotal.org"
@@ -33,7 +34,7 @@ def call_supported_types(supported=[]):
             request_type = self.obj._meta['crits_type']
             if request_type not in supported:
                 logger.warn("PassiveTotal: Invalid type.")
-                self._warning("%s: Invalid type specified." % f.func_name)
+                self._warning("%s: Invalid type specified." % f.__name__)
                 return
             return f(self, *args)
         return wrapper
@@ -64,7 +65,7 @@ class PassiveTotalService(Service):
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 

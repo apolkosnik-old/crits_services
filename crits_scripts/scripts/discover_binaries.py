@@ -1,3 +1,4 @@
+from __future__ import print_function
 import ast
 import sys
 
@@ -25,25 +26,25 @@ class CRITsScript(CRITsBaseScript):
         try:
             err = open(errorpath, "w")
         except:
-            print "Could not open file handle to write to: %s" % errorpath
+            print("Could not open file handle to write to: %s" % errorpath)
             sys.exit(1)
 
         error_count = 0
         samples = Sample.objects(__raw__=query)
         count = len(samples)
-        print "Migrating %s samples found with query %s...\n" % (count, query)
+        print("Migrating %s samples found with query %s...\n" % (count, query))
         i = 1
         for s in samples:
             md5 = s.md5
             try:
-                print >> sys.stdout, "\r\tWorking on sample %d of %d" % (i, count),
+                print("\r\tWorking on sample %d of %d" % (i, count), end=' ', file=sys.stdout)
                 sys.stdout.flush()
                 s.discover_binary()
                 s.save()
-            except Exception, e:
+            except Exception as e:
                 error_count += 1
                 err.write("Error saving sample for discover binary: %s - %s" % (md5, e))
             i += 1
         if error_count:
-            print "Check %s for samples that didn't get their binaries updated!" % errorpath
-        print "Discover binaries process has completed."
+            print("Check %s for samples that didn't get their binaries updated!" % errorpath)
+        print("Discover binaries process has completed.")

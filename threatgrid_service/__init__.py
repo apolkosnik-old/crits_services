@@ -1,4 +1,7 @@
-import urlparse
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+import urllib.parse
 import logging
 import requests
 import json
@@ -48,12 +51,12 @@ class ThreatGRIDService(Service):
         """
         config = {}
         fields = forms.ThreatGRIDConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -79,7 +82,7 @@ class ThreatGRIDService(Service):
 
         # Rename keys so they render nice.
         fields = forms.ThreatGRIDConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
         return display_config
 
@@ -111,7 +114,7 @@ class ThreatGRIDService(Service):
         Handle HTTP/HTTPS requests to the API
         - Implement error handling in a single location
         """
-        url = urlparse.urljoin(self.host, path)
+        url = urllib.parse.urljoin(self.host, path)
         req_params['api_key'] = self.api_key
         req_verify = False  # SSL CERT verification
 
@@ -169,7 +172,7 @@ class ThreatGRIDService(Service):
             result_count = response.get('data', {}).get('current_item_count', 0)
             if result_count > 0:
                 # Handle search by ID
-                if 'id' in params.keys():
+                if 'id' in list(params.keys()):
                     item = response.get('data', {}).get('items')
                     if len(item) == 1:
                         # Detect analysis state

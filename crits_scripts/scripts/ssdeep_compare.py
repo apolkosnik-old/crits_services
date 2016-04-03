@@ -2,6 +2,7 @@
 Example Usage:
     python ssdeep_compare.py -m d386a81ec23170159febfe8ab69193cf -t 10"
 """
+from __future__ import print_function
 
 import sys
 from optparse import OptionParser
@@ -29,13 +30,13 @@ class CRITsScript(CRITsBaseScript):
             hash_type = 'ssdeep'
             hash_value = opts.ssdeep
         else:
-            print "Must provide an MD5 of ssdeep hash"
+            print("Must provide an MD5 of ssdeep hash")
             sys.exit(1)
         if opts.threshold:
             threshold = opts.threshold
         else:
             threshold = 50
         results = ssdeep_compare(hash_type, hash_value, threshold=threshold, use_mime=False)
-        print results
+        print(results)
         for result in results["match_list"]:
-            print "Match %s - %d%%" % (result["md5"], result["score"])
+            print("Match %s - %d%%" % (result["md5"], result["score"]))

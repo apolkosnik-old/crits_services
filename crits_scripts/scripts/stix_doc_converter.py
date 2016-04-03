@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from past.builtins import basestring
 # (c) 2013, Bloomberg Finance L.P.  All rights reserved.
 # Source code distributed pursuant to license agreement.
 import os
@@ -98,7 +101,7 @@ class CRITsScript(CRITsBaseScript):
         ns -- the namespace we are attempting to find a prefix for
         nsmap -- a dictionary containing prefix-to-namespace mappings
         """
-        for k,v in nsmap.iteritems():
+        for k,v in nsmap.items():
             if v == ns:
                 return k
         
