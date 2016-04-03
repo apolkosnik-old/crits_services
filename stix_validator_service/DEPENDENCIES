@@ -1,4 +1,0 @@
-The STIX Validator service requires:
-
-- stix-validator
-    - pip install stix-validator

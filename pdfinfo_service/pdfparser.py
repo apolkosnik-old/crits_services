@@ -88,7 +88,7 @@ if sys.version_info[0] >= 3:
 else:
     from io import BytesIO
     import urllib.request, urllib.error, urllib.parse
-    urllib23 = urllib2
+    urllib23 = urllib
 try:
     import yara
 except:
