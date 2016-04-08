@@ -316,7 +316,7 @@ def upload_standards(request):
                                   {'response': json.dumps(response)},
                                   RequestContext(request))
 
-    data = u''
+    data = ''
     for chunk in request.FILES['filedata']:
         data += chunk
 
@@ -348,6 +348,6 @@ def taxii_service_context(request):
         user = request.user.username
         try:
             context['upload_standards'] = forms.UploadStandardsForm(user)
-        except Exception, e:
+        except Exception as e:
             logger.warning("Base Context UploadStandardsForm Error: %s" % e)
     return context

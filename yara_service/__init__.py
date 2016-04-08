@@ -35,7 +35,7 @@ class YaraService(Service):
         if not sigfiles:
             raise ServiceConfigError("Must specify signature files.")
 
-        if isinstance(sigfiles, basestring):
+        if isinstance(sigfiles, str):
             config['sigfiles'] = [sigfile for sigfile in sigfiles.split('\r\n')]
         # This will raise ServiceConfigError
         YaraService._compile_rules(config['sigdir'], config['sigfiles'])
@@ -45,12 +45,12 @@ class YaraService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.YaraConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -60,7 +60,7 @@ class YaraService(Service):
 
         # Rename keys so they render nice.
         fields = forms.YaraConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             if name == 'sigfiles':
                 display_config[field.label] = '\r\n'.join(config[name])
             else:

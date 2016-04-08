@@ -34,7 +34,7 @@ class CRITsScript(CRITsBaseScript):
             for item in md5_list:
                 try:
                     if item['md5'] != None:
-                        print item['md5']
+                        print(item['md5'])
                 except:
                     pass
         except:

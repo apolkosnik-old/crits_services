@@ -1,4 +1,4 @@
-import sdv
+#import sdv
 
 from io import BytesIO
 
@@ -22,32 +22,32 @@ def validate_stix(xml):
     try:
         result = sdv.validate_xml(f, schemaloc=True)
         rdict['xml'] = result.as_dict()
-    except sdv.errors.UnknownSTIXVersionError, e:
+    except sdv.errors.UnknownSTIXVersionError as e:
         rdict['xml'] = "Could not determine @version attribute: %s" % str(e)
-    except sdv.errors.InvalidSTIXVersionError, e:
+    except sdv.errors.InvalidSTIXVersionError as e:
         rdict['xml'] = "@version attribute is invalid: %s" % str(e)
-    except sdv.errors.ValidationError, e:
+    except sdv.errors.ValidationError as e:
         rdict['xml'] = "Schema directory not found or schemaloc is False: %s" % str(e)
-    except sdv.errors.XMLSchemaImportError, e:
+    except sdv.errors.XMLSchemaImportError as e:
         rdict['xml'] = "Error while processing schemas for validation: %s" % str(e)
-    except sdv.errors.XMLSchemaIncludeError, e:
+    except sdv.errors.XMLSchemaIncludeError as e:
         rdict['xml'] = "Error processing xs:include directives: %s" % str(e)
-    except IOError, e:
+    except IOError as e:
         rdict['xml'] = "Not a valid XML document: %s" % str(e)
-    except Exception, e:
+    except Exception as e:
         rdict['xml'] = str(e)
 
     f.seek(0)
     try:
         result = sdv.validate_best_practices(f)
         rdict['best_practices'] = result.as_dict()
-    except sdv.errors.UnknownSTIXVersionError, e:
+    except sdv.errors.UnknownSTIXVersionError as e:
         rdict['best_practices'] = "Could not determine @version attribute: %s" % str(e)
-    except sdv.errors.InvalidSTIXVersionError, e:
+    except sdv.errors.InvalidSTIXVersionError as e:
         rdict['best_practices'] = "@version attribute is invalid: %s" % str(e)
-    except IOError, e:
+    except IOError as e:
         rdict['best_practices'] = "Not a valid XML document: %s" % str(e)
-    except Exception, e:
+    except Exception as e:
         rdict['best_practices'] = str(e)
 
     #f.seek(0)

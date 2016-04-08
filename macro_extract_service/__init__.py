@@ -35,7 +35,7 @@ class MacroExtractService(Service):
         filedata = obj.filedata.read()
         try:
             vbaparser = VBA_Parser(filename, data=filedata)
-        except Exception, e:
+        except Exception as e:
             self._error("Cannot parse file: %s" % str(e))
             return
         if vbaparser.detect_vba_macros():

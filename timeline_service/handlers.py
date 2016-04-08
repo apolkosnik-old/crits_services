@@ -1,5 +1,5 @@
 import cgi
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
@@ -72,7 +72,7 @@ def generate_timeline(obj_type, obj_id, user):
         rev = '%s?search_type=object&otype=%s&q=%s&force_full=1' \
                 % (reverse('crits.core.views.global_search_listing'),
                    "%s" % (type_),
-                   urllib.quote(value))
+                   urllib.parse.quote(value))
         link = '<a href="%s">%s</a>' % (cgi.escape(rev), cgi.escape(value))
         i = "<b>%s</b> object added with a value of :<br />%s" % (type_,
                                                                   link)
@@ -174,8 +174,7 @@ def generate_timeline(obj_type, obj_id, user):
 
     # sort timeline
     sorted_timeline = []
-    keys = timeline.keys()
-    keys.sort()
+    keys = sorted(list(timeline.keys()))
     for key in keys:
         k = timeline[key]
         k.sort(key=lambda tup:tup[0])

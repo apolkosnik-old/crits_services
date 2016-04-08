@@ -88,7 +88,7 @@ def generate_anb_event_data(type_, cid, data, sources):
                                       sources,
                                       need_filedata=False)
 
-    for (obj_id, (obj_type, obj)) in related_objects.iteritems():
+    for (obj_id, (obj_type, obj)) in related_objects.items():
         if obj_type == 'Email':
             data['emails'] += "%s,%s,%s,%s,%s,%s,%s\r\n" % (
                 cid,

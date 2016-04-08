@@ -34,12 +34,12 @@ class WHOISService(Service):
     def get_config(existing_config):
         config = {}
         fields = forms.WHOISConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -49,7 +49,7 @@ class WHOISService(Service):
 
         # Rename keys so they render nice.
         fields = forms.WHOISConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
         return display_config
 
@@ -103,11 +103,11 @@ class WHOISService(Service):
             return
 
         contacts = results.get('contacts', {})
-        for contact_type in contacts.keys():
+        for contact_type in list(contacts.keys()):
             # If not provided it defaults to None.
             if not contacts[contact_type]:
                 continue
-            for k, v in contacts[contact_type].iteritems():
+            for k, v in contacts[contact_type].items():
                 self._add_result("Live: " + contact_type + " Contact", v, {'Key': k})
 
         for ns in results.get('nameservers', []):
@@ -162,7 +162,7 @@ class WHOISService(Service):
             # Only grab the most recent version.
             if data['Version'] != latest:
                 continue
-            for k, v in data.iteritems():
+            for k, v in data.items():
                 # Don't add empty strings.
                 if v:
                     self._add_result('pyDat Latest', v, {'Key': k})
@@ -179,8 +179,8 @@ class WHOISService(Service):
         results = results['response']['parsed_whois']
 
         contacts = results.get('contacts', {})
-        for contact_type in contacts.keys():
-            for k, v in contacts[contact_type].iteritems():
+        for contact_type in list(contacts.keys()):
+            for k, v in contacts[contact_type].items():
                 if v:
                     self._add_result("DomainTools: " + contact_type + " Contact", v, {'Key': k})
 
@@ -192,7 +192,7 @@ class WHOISService(Service):
             self._add_result('DomainTools: Nameservers', ns, {})
 
         registrar = results.get('registrar', {})
-        for k, v in registrar.iteritems():
+        for k, v in registrar.items():
             if v:
                 self._add_result('DomainTools: Registrar', v, {'Key': k})
 

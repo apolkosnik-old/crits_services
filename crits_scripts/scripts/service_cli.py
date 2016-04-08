@@ -15,11 +15,11 @@ class CRITsScript(CRITsBaseScript):
 
     def run_services(self, service_list, obj_list, verbose=False, config={}):
         if verbose:
-            print "Running services\n-------------------\n"
+            print("Running services\n-------------------\n")
         for obj in obj_list:
             for service in service_list:
                 if verbose:
-                    print "    [+] {0} scan obj: {1}".format(service, obj.id)
+                    print("    [+] {0} scan obj: {1}".format(service, obj.id))
                 try:
                     result = run_service(service,
                                          obj._meta['crits_type'],
@@ -30,24 +30,24 @@ class CRITsScript(CRITsBaseScript):
                                          execute='process')
                     if result['success'] != True:
                         if verbose:
-                            print "    [+] %s" % result['html']
+                            print("    [+] %s" % result['html'])
                 except ServiceAnalysisError as e:
                     if verbose:
-                        print "    [+] %s" % e
+                        print("    [+] %s" % e)
 
     def print_running_services(self, service_list):
-        print "\nServices:\n---------------"
+        print("\nServices:\n---------------")
         for service_name in service_list:
-            print "    [+] {0}".format(service_name)
-        print "\n"
+            print("    [+] {0}".format(service_name))
+        print("\n")
 
     def print_object_stats(self, obj_list, query_filter=None):
         if query_filter:
-            print "Objects from {0}\n----------------".format(query_filter)
+            print("Objects from {0}\n----------------".format(query_filter))
         else:
-            print "\nObjects\n------------"
-        print "    [+] %d objects" % (len(obj_list))
-        print "\n"
+            print("\nObjects\n------------")
+        print("    [+] %d objects" % (len(obj_list)))
+        print("\n")
 
     def run(self, argv):
         parser = OptionParser()
@@ -75,7 +75,7 @@ class CRITsScript(CRITsBaseScript):
             query = ast.literal_eval(opts.query_filter)
             klass = class_from_type(opts.type_)
             if not klass:
-                print "[-] Invalid type."
+                print("[-] Invalid type.")
             obj_list = klass.objects(__raw__=query)
             if opts.verbose:
                 self.print_object_stats(obj_list, opts.query_filter)
@@ -83,7 +83,7 @@ class CRITsScript(CRITsBaseScript):
         if opts.identifier:
             obj = class_from_value(opts.type_, opts.identifier)
             if not obj:
-                print "[-] Unable to find object."
+                print("[-] Unable to find object.")
                 return
 
             obj_list = [obj]

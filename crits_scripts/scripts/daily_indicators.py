@@ -14,4 +14,4 @@ class CRITsScript(CRITsBaseScript):
         yesterday = today - datetime.timedelta(days=1)
         i = indicators.find({'created': {'$gte': yesterday, '$lt': today}}, {'type': 1, 'value': 1})
         for a in i:
-            print "%s, %s" % (a['type'], a['value'])
+            print("%s, %s" % (a['type'], a['value']))

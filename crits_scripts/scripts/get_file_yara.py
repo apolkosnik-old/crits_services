@@ -25,7 +25,7 @@ class CRITsScript(CRITsBaseScript):
             try:
                 tar = tarfile.open(filename, "w:bz2")
             except Exception as e:
-                print ("Error when attempting to open %s for writing: %s" % (filename, e))
+                print(("Error when attempting to open %s for writing: %s" % (filename, e)))
                 sys.exit(1)
             samples = mongo_connector(settings.COL_ANALYSIS_RESULTS)
             results = samples.find({'results.result': '%s' % opts.yarahit}, {'object_id': 1})
@@ -34,16 +34,16 @@ class CRITsScript(CRITsBaseScript):
                 print ("No matching samples found!")
                 sys.exit(1)
             for result in results:
-                print ("oid next in %s " % settings.COL_SAMPLES )
+                print(("oid next in %s " % settings.COL_SAMPLES ))
                 boid = result['object_id']
-                print ("oid: %s" % str(boid))
+                print(("oid: %s" % str(boid)))
                 try:
                     fm = mongo_connector(settings.COL_SAMPLES)
                     f = fm.find_one({'_id': bson.ObjectId(oid=str(boid))}, {'filename':1 })['filename']
                     m = fm.find_one({ '_id' : bson.ObjectId(oid=str(boid))}, {'md5':1})['md5']
-                    print ("m: %s" % str(m))
+                    print(("m: %s" % str(m)))
                 except Exception as e:
-                    print ("Error : %s" % (e))
+                    print(("Error : %s" % (e)))
                     return None
                 s = get_file(m)
                 info = tarfile.TarInfo(name="%s" % f)
@@ -55,7 +55,7 @@ class CRITsScript(CRITsBaseScript):
                 try:
                     tar.addfile(info, BytesIO(s))
                 except Exception as e:
-                    print ("Error attempting to add %s to the tarfile: %s" % (f, e))
+                    print(("Error attempting to add %s to the tarfile: %s" % (f, e)))
                     pass
             tar.close()
-            print ("Generated %s containing %s files." % (filename, count))
+            print(("Generated %s containing %s files." % (filename, count)))

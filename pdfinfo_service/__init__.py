@@ -3,8 +3,8 @@ import logging
 
 from crits.services.core import Service, ServiceConfigError
 
-import pdfparser
-import pdfid
+from . import pdfparser
+from . import pdfid
 import math
 import re
 import json
@@ -176,7 +176,7 @@ class PDFInfoService(Service):
                             streamContent = pdf_object.Stream('')
 
                         #Stream returns list of object tags (not actual stream data)
-                        if type(streamContent) == list:
+                        if isinstance(streamContent, list):
                             streamContent = pdfparser.FormatOutput(pdf_object.content, True)
                             #Inspect pdf_object.content and extract raw stream
                             stream_start = streamContent.find('stream') + len('stream')

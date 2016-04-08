@@ -258,7 +258,7 @@ def make_cybox_object(type_, value=None):
         acct = Account()
         acct.description = value
         return acct
-    elif type_ in IPTypes.values():
+    elif type_ in list(IPTypes.values()):
         if type_ == IPTypes.IPV4_ADDRESS:
             name = 'ipv4-addr'
         elif type_ == IPTypes.IPV6_ADDRESS:

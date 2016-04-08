@@ -2,7 +2,7 @@ import os
 import re
 import hashlib
 import tempfile
-import HTMLParser
+import html.parser
 import logging
 from chm import chm
 
@@ -94,14 +94,14 @@ class CHMInfoService(Service):
         results = []
         data = self.unescape(data).lower()
         #Regex matching
-        for match, desc in self.item_regex.items():
+        for match, desc in list(self.item_regex.items()):
             found = re.findall(match.lower(), data)
             for res in found:
                 temp = desc + ' (' + res + ').'
                 results.append(temp)
 
         #String matching
-        for match, desc in self.item_string.items():
+        for match, desc in list(self.item_string.items()):
             if match.lower() in data:
                 results.append(desc)
         return results
@@ -113,10 +113,10 @@ class CHMInfoService(Service):
         - Inspects the pages within the CHM
         """
         results = []
-        url = re.compile(ur'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s
+        url = re.compile(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s
             ()<>\'\"]+|\(([^\s()<>]+|(\([^\s()<>\'\"]+\)))*\))+(?:\(([^\s()<>\'\"]+|(\([^\s\(\)<>
             \'\"]+\)))*\)|[^\s`!()\[\]{};:\'\"\.,<>?\xab\xbb\u201c\u201d\u2018\u2019]))''')
-        ip = re.compile(ur'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b')
+        ip = re.compile(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b')
 
         #Regex matches
         data = self.unescape(data)
@@ -138,7 +138,7 @@ class CHMInfoService(Service):
         Unescape HTML code
         - Used to assist with inspection of document items
         """
-        html_parser = HTMLParser.HTMLParser()
+        html_parser = html.parser.HTMLParser()
         try:
             data = data.decode('ascii','ignore')
             data = html_parser.unescape(data)
@@ -223,11 +223,11 @@ class CHMInfoService(Service):
         result = self.analyze()
 
         #Handle output of results
-        if 'obj_items_summary' in result.keys():
+        if 'obj_items_summary' in list(result.keys()):
             obj_items_summary = result.pop('obj_items_summary')
 
         #General CHM info
-        for key, value in result.items():
+        for key, value in list(result.items()):
             self._add_result('chm_overview', key, {'value': value})
 
         if config['chm_items']:

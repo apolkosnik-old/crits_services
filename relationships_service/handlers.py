@@ -181,7 +181,7 @@ def gather_relationships(obj_type, obj_id, user, depth, types):
         # If we traverse into a Campaign object, walk everything tagged
         # with that campaign along with related objects.
         if obj_type == 'Campaign':
-            for c in field_dict.keys():
+            for c in list(field_dict.keys()):
                 klass = class_from_type(c)
                 # Not every object in field_dict can be tagged with a campaign.
                 # For example, comments.
@@ -227,7 +227,7 @@ def gather_relationships(obj_type, obj_id, user, depth, types):
 
     campaign_cache = {}
     node_position = 0
-    for (obj_id, obj) in objects.iteritems():
+    for (obj_id, obj) in objects.items():
         if obj_id in obj_graph:
             continue
 
@@ -261,7 +261,7 @@ def gather_relationships(obj_type, obj_id, user, depth, types):
                     source_ids.append(obj_id)
                 else:
                     total = 0
-                    for count in campaign_details['counts'].values():
+                    for count in list(campaign_details['counts'].values()):
                         total += count
                     campaign = name + " (" + str(total) + ")"
                     campaign_href = reverse('crits.core.views.details', args=('Campaign', campaign_id))
@@ -307,7 +307,7 @@ def gather_relationships(obj_type, obj_id, user, depth, types):
     # that when B->A is handled it will be ignored.
     link_dict = {}
 
-    for (tid, (tnode, source_ids)) in obj_graph.iteritems():
+    for (tid, (tnode, source_ids)) in obj_graph.items():
         for sid in source_ids:
             # If the graph is cut off the related object may not have been
             # collected. If the inverse relationship is already done, no

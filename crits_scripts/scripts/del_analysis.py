@@ -31,11 +31,11 @@ class CRITsScript(CRITsBaseScript):
 
         service = opts.service
         if service not in m.services:
-            print "Warning: unknown service %s" % service
+            print("Warning: unknown service %s" % service)
 
         dest = DatabaseAnalysisDestination()
 
         for md5 in args:
-            print "Deleting %s (%s)" % (md5, service)
+            print("Deleting %s (%s)" % (md5, service))
             dest._delete_all_analysis_results(md5, service)
-        print "Done"
+        print("Done")

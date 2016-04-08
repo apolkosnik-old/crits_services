@@ -1,7 +1,7 @@
 import logging
 import simplejson
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -38,12 +38,12 @@ class ShodanService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.ShodanConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -68,7 +68,7 @@ class ShodanService(Service):
 
         # Rename keys so they render nice.
         fields = forms.ShodanConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
 
         return display_config
@@ -85,7 +85,7 @@ class ShodanService(Service):
         if obj._meta['crits_type'] == 'IP':
             try:
                 result_dict = api.host(obj.ip)
-            except shodan.APIError, e:
+            except shodan.APIError as e:
                 logger.error('Shodan API Error (%s)' % e)
                 self._error("Network connection error checking Shodan (%s)" % e)
                 return
@@ -96,7 +96,7 @@ class ShodanService(Service):
         # These are the keys we don't care about
         keys = ['data', 'ports', 'hostnames', 'vulns', 'ip_str']
         if obj._meta['crits_type'] == 'IP':
-            for key, val in sorted(result_dict.iteritems()):
+            for key, val in sorted(result_dict.items()):
                 if key not in keys:
                     stats = {'data': result_dict.get(key, 'n/a')}
                     if result_dict.get(key, 'n/a'):

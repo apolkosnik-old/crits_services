@@ -212,7 +212,7 @@ class ExtendedTimeStamp():
         "TSize"      :struct.unpack("<H", extraField[2:4])[0],
         "Flags"      :struct.unpack("<B",extraField[4:5])[0]
         }
-        for i in xrange (0,8):
+        for i in range (0,8):
             if parsedBlock["Flags"] & (2**i) > 0:
                 if i == 0:
                     MTime = True

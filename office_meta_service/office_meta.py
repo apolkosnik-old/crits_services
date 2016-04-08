@@ -87,7 +87,7 @@ class OfficeParser(object):
             return ''
         elif sector < len(self.fat_table):
             if self.verbose:
-                print "request sector %d - len %d" % (sector, len(self.fat_table))
+                print("request sector %d - len %d" % (sector, len(self.fat_table)))
             if self.fat_table[sector] == 0xfffffffe:
                 return self.get_fat_sector(sector)
             elif sector != self.fat_table[sector]:
@@ -111,14 +111,14 @@ class OfficeParser(object):
     def make_fat(self, sector_list):
         fat = array.array('I')
         if self.verbose:
-            print "sector_list = %s" % sector_list
+            print("sector_list = %s" % sector_list)
         for sector in sector_list:
             sect_data = (self.get_fat_sector(sector))
             if len(sect_data) > 0:
                 fat += array.array('I', self.get_fat_sector(sector))
             else:
                 if self.verbose:
-                    print "!!!!! Error, invalid SAT table, sector missing"
+                    print("!!!!! Error, invalid SAT table, sector missing")
         return fat
 
     def parse_office_header(self):
@@ -152,20 +152,20 @@ class OfficeParser(object):
                 if mini_fat_sectors:
                     self.mini_fat_table = self.make_fat(mini_fat_sectors)
         if self.verbose:
-            print "[+] FAT Tables"
-            print self.fat_table
-            print self.mini_fat_table
+            print("[+] FAT Tables")
+            print(self.fat_table)
+            print(self.mini_fat_table)
         return office_header
 
     def find_office_header(self):
         offset = self.data.find(self.office_magic)
         if offset >= 0:
             if self.verbose:
-                print "\t[+] found office header at offset %04X" % offset
+                print("\t[+] found office header at offset %04X" % offset)
             self.data = self.data[offset:]
             return offset
         if self.verbose:
-            print "\t[-] could not find office header"
+            print("\t[-] could not find office header")
         return None
 
     def parse_property_set_header(self, prop_data):
@@ -186,7 +186,7 @@ class OfficeParser(object):
             # provide a text string for the system value
             if property_set_header['num_properties'] not in [1,2] or property_set_header['byte_order'] != 'feff':
                 if self.verbose:
-                    print "[+] invalid property set record"
+                    print("[+] invalid property set record")
                 return property_set_header
             property_set_header['system_name'] = system_values.get(property_set_header['system_version'], 'Unknown')
             for i in range(property_set_header['num_properties']):
@@ -264,7 +264,7 @@ class OfficeParser(object):
 
     def parse_summary_information(self, summary_data, prop_type):
         if self.verbose:
-            print "\t[+] parsing %d bytes of summary_data for %s" % (len(summary_data), prop_type)
+            print("\t[+] parsing %d bytes of summary_data for %s" % (len(summary_data), prop_type))
         if len(summary_data) >= 28:
             property_set_header = self.parse_property_set_header(summary_data)
             for item in property_set_header["property_list"]:
@@ -317,14 +317,14 @@ class OfficeParser(object):
             else:
                  dir_data = ''
             if self.verbose:
-                print "[+] got %d data from %s" % (len(dir_data), entry['result'])
+                print("[+] got %d data from %s" % (len(dir_data), entry['result']))
             # check the directory specific content and parse
             if entry['object_type'] in [0,2] and len(dir_data) > 0:
-                for clsid in self.summary_mapping.keys():
+                for clsid in list(self.summary_mapping.keys()):
                     if clsid in dir_data:
                         self.properties.append(self.parse_summary_information(dir_data, clsid))
                         if self.verbose:
-                            print self.properties
+                            print(self.properties)
             if len(dir_data) > 0:
                 entry['md5'] = hashlib.md5(dir_data).hexdigest()
                 entry['data'] = dir_data
@@ -335,24 +335,24 @@ class OfficeParser(object):
         return {}
 
     def pretty_print(self):
-        print "\nDocument Summary\n" + "-" * 40
-        print "%20s:%20s" % ("Magic", self.office_header['magic'])
-        print "%20s:%20s" % ("Version", "%d.%d" % (self.office_header['maj_ver'], self.office_header['min_ver']))
-        print "\nDirectories\n" + "-" * 40
+        print("\nDocument Summary\n" + "-" * 40)
+        print("%20s:%20s" % ("Magic", self.office_header['magic']))
+        print("%20s:%20s" % ("Version", "%d.%d" % (self.office_header['maj_ver'], self.office_header['min_ver'])))
+        print("\nDirectories\n" + "-" * 40)
         for directory in self.directory:
             if len(directory['norm_name']) > 0:
-                print "\t%40s - %10d - %32s" % (directory.get('norm_name', ''), directory.get('stream_size', 0), directory.get('md5', 0))
-        print "\nProperties\n" + "-" * 40
+                print("\t%40s - %10d - %32s" % (directory.get('norm_name', ''), directory.get('stream_size', 0), directory.get('md5', 0)))
+        print("\nProperties\n" + "-" * 40)
         for prop_list in self.properties:
             for prop in prop_list['property_list']:
                 prop_summary = self.summary_mapping.get(binascii.unhexlify(prop['clsid']), {})
                 prop_name = prop_summary.get('name', 'Unknown')
-                print "\n\t%s" % prop_name
+                print("\n\t%s" % prop_name)
                 if len(prop.get('properties', [])) > 0:
                     if len(prop['properties'].get('properties', [])) > 0:
                         for item in prop['properties']['properties']:
                             value = item.get('date', item['value'])
-                            print "%50s - %40s" % (item['name'], value)
+                            print("%50s - %40s" % (item['name'], value))
     def parse_office_doc(self):
         if (self.find_office_header() == None):
             return None

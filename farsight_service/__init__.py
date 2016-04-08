@@ -1,7 +1,7 @@
 import time
 import logging
 import simplejson
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -36,12 +36,12 @@ class FarsightService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.FarsightConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -68,7 +68,7 @@ class FarsightService(Service):
 
         # Rename keys so they render nice.
         fields = forms.FarsightConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
 
         return display_config
@@ -86,14 +86,14 @@ class FarsightService(Service):
         elif obj._meta['crits_type'] == 'Domain':
             url = '%s/lookup/rrset/name/%s?limit=1000' % (url, obj.domain)
 
-        req = urllib2.Request(url, headers={'X-API-Key' : '%s' % key, 'Accept': 'application/json'})
+        req = urllib.request.Request(url, headers={'X-API-Key' : '%s' % key, 'Accept': 'application/json'})
 
         if settings.HTTP_PROXY:
-            proxy = urllib2.ProxyHandler({'https': settings.HTTP_PROXY})
-            opener = urllib2.build_opener(proxy)
-            urllib2.install_opener(opener)
+            proxy = urllib.request.ProxyHandler({'https': settings.HTTP_PROXY})
+            opener = urllib.request.build_opener(proxy)
+            urllib.request.install_opener(opener)
         try:
-            response = urllib2.urlopen(req)
+            response = urllib.request.urlopen(req)
             res = []
             while True:
                 line = response.readline()
@@ -178,7 +178,7 @@ class FarsightService(Service):
                         stats['data'].append(d[:-1])
                     else:
                         stats['data'].append(d)
-            elif isinstance(entry, basestring):
+            elif isinstance(entry, str):
                 # Chop the trailing period.
                 if entry[-1] == '.':
                     stats['data'].append(entry[:-1])
@@ -194,7 +194,7 @@ class FarsightService(Service):
             else:
                 results[rrtype] = [stats]
 
-        for rrtype, stats_list in results.iteritems():
+        for rrtype, stats_list in results.items():
             for stats in stats_list:
                 data = stats['data']
                 del stats['data']

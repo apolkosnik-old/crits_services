@@ -4,7 +4,7 @@ from tastypie import authorization
 from tastypie.authentication import MultiAuthentication
 from tastypie.exceptions import BadRequest
 
-from handlers import import_standards_doc
+from .handlers import import_standards_doc
 from crits.core.api import CRITsApiKeyAuthentication, CRITsSessionAuthentication
 from crits.core.api import CRITsSerializer, CRITsAPIResource
 from crits.core.crits_mongoengine import CritsDocument

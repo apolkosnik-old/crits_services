@@ -33,28 +33,28 @@ class CRITsScript(CRITsBaseScript):
         (opts, args) = parser.parse_args(argv)
 
         if opts.sampledelete or opts.sampledeletequery:
-            print "Deleting matching md5s from %s..." % opts.collection
+            print("Deleting matching md5s from %s..." % opts.collection)
             count = 0
             failed = 0
             try:
                 samples = mongo_connector(opts.collection)
-            except Exception, e:
-                print "Error: %s" % str(e)
+            except Exception as e:
+                print("Error: %s" % str(e))
                 sys.exit(1)
             try:
                 if opts.sampledeletequery:
                     query = ast.literal_eval(opts.sampledeletequery)
                     samples.remove(query)
-                    print "Deleted samples matching query %s..." % query
+                    print("Deleted samples matching query %s..." % query)
                 else:
                     with open(opts.sampledelete) as o:
                         for line in o:
                             md5 = line.strip()
                             samples.remove({'hashes.md5': md5})
                             count += 1
-                    print "Deleted %s md5s from old collection." % count
-            except Exception, e:
-                print "Mongo Error: %s" % str(e)
+                    print("Deleted %s md5s from old collection." % count)
+            except Exception as e:
+                print("Mongo Error: %s" % str(e))
                 sys.exit(1)
             sys.exit(0)
 
@@ -63,15 +63,15 @@ class CRITsScript(CRITsBaseScript):
             try:
                 err = open(errorpath, "w")
             except:
-                print "Could not open file handle to write to: %s" % errorpath
+                print("Could not open file handle to write to: %s" % errorpath)
                 sys.exit(1)
             filename = None
             error_count = 0
             if opts.gridfs:
-                print "Copying GridFS data matching md5s to new collection..."
+                print("Copying GridFS data matching md5s to new collection...")
                 filename = opts.gridfs
             elif opts.griddelete:
-                print "Deleting matching md5s from GridFS..."
+                print("Deleting matching md5s from GridFS...")
                 filename = opts.griddelete
             count = 0
             no_data = 0
@@ -97,14 +97,14 @@ class CRITsScript(CRITsBaseScript):
                         else:
                             no_data += 1
                 if opts.gridfs:
-                    print "Copied %s md5s to new collection." % count
+                    print("Copied %s md5s to new collection." % count)
                     if error_count:
-                        print "Check %s for samples that didn't get their binaries updated!" % errorpath
+                        print("Check %s for samples that didn't get their binaries updated!" % errorpath)
                 elif opts.griddelete:
-                    print "Deleted %s md5s from GridFS." % count
-                print "There were %s md5s which we did not find data for." % no_data
-            except Exception, e:
-                print "Error: %s" % str(e)
+                    print("Deleted %s md5s from GridFS." % count)
+                print("There were %s md5s which we did not find data for." % no_data)
+            except Exception as e:
+                print("Error: %s" % str(e))
                 sys.exit(1)
             sys.exit(0)
 
@@ -117,8 +117,8 @@ class CRITsScript(CRITsBaseScript):
                 query = {}
 
             sample_list = samples.find(query)
-        except Exception, e:
-            print "Error setting up/executing query: %s" % str(e)
+        except Exception as e:
+            print("Error setting up/executing query: %s" % str(e))
             sys.exit(1)
 
         filepath = "/tmp/sample_migrate_results.txt"
@@ -127,16 +127,16 @@ class CRITsScript(CRITsBaseScript):
             f = open(filepath, "w")
             e = open(errorpath, "w")
         except:
-            print "Could not open file handle to write to: %s" % filepath
+            print("Could not open file handle to write to: %s" % filepath)
             sys.exit(1)
 
         count = sample_list.count()
-        print "Migrating %s samples found with query %s...\n" % (count, query)
+        print("Migrating %s samples found with query %s...\n" % (count, query))
         i = 1
         failed = 0
         for s in sample_list:
             try:
-                print >> sys.stdout, "\r\tWorking on sample %d of %d" % (i, count),
+                print("\r\tWorking on sample %d of %d" % (i, count), end=' ', file=sys.stdout)
                 sys.stdout.flush()
                 hashes = s['hashes']
                 if 'md5' in hashes:
@@ -159,13 +159,13 @@ class CRITsScript(CRITsBaseScript):
                 sample.save(s)
                 f.write("%s\n" % s['md5'])
                 i += 1
-            except Exception, e:
+            except Exception as e:
                 failed += 1
                 e.write("Issue with Sample ID: %s -- %s" % (s['_id'], str(e)))
         f.close()
-        print "\n\nWe did not remove any samples from the old collection!"
-        print "Please clean up your old samples collection as needed."
-        print "Review %s for a list of md5s which need GridFS migration." % filepath
+        print("\n\nWe did not remove any samples from the old collection!")
+        print("Please clean up your old samples collection as needed.")
+        print("Review %s for a list of md5s which need GridFS migration." % filepath)
         if failed:
-            print "There were %s failed migrations!" % failed
-            print "View %s for information on failed migrations!" % errorpath
+            print("There were %s failed migrations!" % failed)
+            print("View %s for information on failed migrations!" % errorpath)

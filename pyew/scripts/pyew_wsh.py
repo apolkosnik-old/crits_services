@@ -35,13 +35,13 @@ import os
 import pexpect
 import sys
 import tempfile
-from urlparse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 
 from crits.core.user import CRITsUser
 from crits.samples.sample import Sample
 from crits.services.service import CRITsService
 
-_GOODBYE_MESSAGE = u'Goodbye'
+_GOODBYE_MESSAGE = 'Goodbye'
 
 def web_socket_do_extra_handshake(request):
     # This example handler accepts any request. See origin_check_wsh.py for how
@@ -155,7 +155,7 @@ def start_pyew_shell(request, id_, token):
         sample_name = temp_sample.name
         temp_sample.write(sample_data)
         temp_sample.close()
-    except Exception, e:
+    except Exception as e:
         text = "\nError writing file to disk: %s" % e
         request.ws_stream.send_message(base64.b64encode(text),
                                        binary=False)

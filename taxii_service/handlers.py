@@ -9,13 +9,13 @@ from datetime import datetime
 from dateutil.parser import parse
 from dateutil.tz import tzutc
 from io import BytesIO
-from M2Crypto import BIO, SMIME, X509, Rand
+#from M2Crypto import BIO, SMIME, X509, Rand
 
-import libtaxii as t
-import libtaxii.clients as tc
-import libtaxii.messages as tm
-import libtaxii.messages_11 as tm11
-from stix.utils import set_id_namespace
+#import libtaxii as t
+#import libtaxii.clients as tc
+#import libtaxii.messages as tm
+#import libtaxii.messages_11 as tm11
+#from stix.utils import set_id_namespace
 
 from django.conf import settings
 from django import forms as dforms
@@ -24,23 +24,23 @@ from django.utils.safestring import SafeText
 
 from mongoengine.base import ValidationError
 
-from cybox.common import String, DateTime, Hash, UnsignedLong
-from cybox.common.object_properties import CustomProperties, Property
-from cybox.core import Observable
-from cybox.objects.address_object import Address, EmailAddress
-from cybox.objects.artifact_object import Artifact, Base64Encoding, ZlibCompression
-from cybox.objects.domain_name_object import DomainName
-from cybox.objects.email_message_object import EmailHeader, EmailMessage, Attachments
-from cybox.objects.file_object import File
+#from cybox.common import String, DateTime, Hash, UnsignedLong
+#from cybox.common.object_properties import CustomProperties, Property
+#from cybox.core import Observable
+#from cybox.objects.address_object import Address, EmailAddress
+#from cybox.objects.artifact_object import Artifact, Base64Encoding, ZlibCompression
+#from cybox.objects.domain_name_object import DomainName
+#from cybox.objects.email_message_object import EmailHeader, EmailMessage, Attachments
+#from cybox.objects.file_object import File
 
-from stix.threat_actor import ThreatActor
+#from stix.threat_actor import ThreatActor
 
-from . import taxii
-from . import formats
-from . import forms
-from .parsers import STIXParser, STIXParserException
-from .object_mapper import make_cybox_object, UnsupportedCybOXObjectTypeError
-from .object_mapper import get_incident_category
+#from . import taxii
+#from . import formats
+#from . import forms
+#from .parsers import STIXParser, STIXParserException
+#from .object_mapper import make_cybox_object, UnsupportedCybOXObjectTypeError
+#from .object_mapper import get_incident_category
 
 from crits.events.event import Event
 from crits.core.class_mapper import class_from_id, class_from_type
@@ -675,7 +675,7 @@ def import_content_blocks(block_ids, action, analyst):
         pids[block.poll_time] = 1 # save unique poll timestamps
 
     if action == "import_delete":
-        taxii.TaxiiContent.objects(poll_time__in=pids.keys(), errors=[]).delete()
+        taxii.TaxiiContent.objects(poll_time__in=list(pids.keys()), errors=[]).delete()
 
     ret.update(tlos) # add the TLO lists to the return dict
 
@@ -1563,7 +1563,7 @@ def update_taxii_server_config(updates, analyst):
 
     try:
         service.save(username=analyst)
-    except ValidationError, e:
+    except ValidationError as e:
         result['message'] = e
         return result
 
@@ -1678,11 +1678,11 @@ def import_standards_doc(data, analyst, method, ref=None, make_event=False,
         parser = STIXParser(data, analyst, method, preview_only)
         parser.parse_stix(reference=ref, make_event=make_event, source=source)
         parser.relate_objects()
-    except STIXParserException, e:
+    except STIXParserException as e:
         logger.exception(e)
         ret['reason'] = str(e.message)
         return ret
-    except Exception, e:
+    except Exception as e:
         logger.exception(e)
         ret['reason'] = str(e)
         return ret

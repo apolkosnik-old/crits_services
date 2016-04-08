@@ -25,12 +25,12 @@ class OpenDNSService(Service):
     def get_config(existing_config):
         config = {}
         fields = forms.OpenDNSConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -45,7 +45,7 @@ class OpenDNSService(Service):
 
         # Rename keys so they render nice.
         fields = forms.OpenDNSConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
         return display_config
 
@@ -71,7 +71,7 @@ class OpenDNSService(Service):
         headers = {'Authorization': 'Bearer ' + token}
         reqs = {}
         resps = {}
-        scores = {u'-1': 'Bad', u'0': 'Unknown', u'1': 'Good'}
+        scores = {'-1': 'Bad', '0': 'Unknown', '1': 'Good'}
 
         if not token:
             self._error("A valid API token is required to use this service.")
@@ -95,7 +95,7 @@ class OpenDNSService(Service):
             return
 
         try:
-            for r in reqs.keys():
+            for r in list(reqs.keys()):
                 resp = requests.get(uri + reqs[r], headers=headers)
 
                 if resp.status_code == 204:
@@ -114,7 +114,7 @@ class OpenDNSService(Service):
             self._error("Network connection or HTTP request error (%s)" % e)
             return
 
-        for r in resps.keys():
+        for r in list(resps.keys()):
             if r == 'categorization':
                 self._add_result(r, thing, resps[r][thing])
             elif r == 'score':

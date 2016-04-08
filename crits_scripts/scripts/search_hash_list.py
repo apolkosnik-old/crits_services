@@ -41,4 +41,4 @@ class CRITsScript(CRITsBaseScript):
                 fout.close()
             else:
                 for result in results:
-                    print result
+                    print(result)

@@ -66,7 +66,7 @@ import collections
 import glob
 import io
 try:
-    import urllib2
+    import urllib.request, urllib.error, urllib.parse
     urllib23 = urllib2
 except:
     import urllib.request
@@ -91,23 +91,23 @@ class cBinaryFile:
                 else:
                     self.infile = urllib23.urlopen(file)
             except urllib23.HTTPError:
-                print('Error accessing URL %s' % file)
-                print(sys.exc_info()[1])
+                print(('Error accessing URL %s' % file))
+                print((sys.exc_info()[1]))
                 sys.exit()
         elif file.lower().endswith('.zip'):
             try:
                 self.zipfile = zipfile.ZipFile(file, 'r')
                 self.infile = self.zipfile.open(self.zipfile.infolist()[0], 'r', C2BIP3('infected'))
             except:
-                print('Error opening file %s' % file)
-                print(sys.exc_info()[1])
+                print(('Error opening file %s' % file))
+                print((sys.exc_info()[1]))
                 sys.exit()
         else:
             try:
                 self.infile = io.BytesIO(file)
             except:
-                print('Error opening file %s' % file)
-                print(sys.exc_info()[1])
+                print(('Error opening file %s' % file))
+                print((sys.exc_info()[1]))
                 sys.exit()
         self.ungetted = []
 
@@ -128,7 +128,7 @@ class cBinaryFile:
         inbytes = self.infile.read(size - len(self.ungetted))
         if inbytes == '':
             self.infile.close()
-        if type(inbytes) == type(''):
+        if isinstance(inbytes, type('')):
             result = self.ungetted + [ord(b) for b in inbytes]
         else:
             result = self.ungetted + [b for b in inbytes]
@@ -231,11 +231,11 @@ class cEntropy:
             self.streamBucket[byte] -= 1
 
     def calc(self):
-        self.nonStreamBucket = map(operator.sub, self.allBucket, self.streamBucket)
+        self.nonStreamBucket = list(map(operator.sub, self.allBucket, self.streamBucket))
         allCount = sum(self.allBucket)
         streamCount = sum(self.streamBucket)
         nonStreamCount = sum(self.nonStreamBucket)
-        return (allCount, sum(map(lambda x: fEntropy(x, allCount), self.allBucket)), streamCount, sum(map(lambda x: fEntropy(x, streamCount), self.streamBucket)), nonStreamCount, sum(map(lambda x: fEntropy(x, nonStreamCount), self.nonStreamBucket)))
+        return (allCount, sum([fEntropy(x, allCount) for x in self.allBucket]), streamCount, sum([fEntropy(x, streamCount) for x in self.streamBucket]), nonStreamCount, sum([fEntropy(x, nonStreamCount) for x in self.nonStreamBucket]))
 
 class cPDFEOF:
     def __init__(self):
@@ -288,13 +288,13 @@ def FindPDFHeaderRelaxed(oBinaryFile):
     return (bytes[0:endHeader], ''.join([chr(byte) for byte in bytes[index:endHeader]]))
 
 def Hexcode2String(char):
-    if type(char) == int:
+    if isinstance(char, int):
         return '#%02x' % char
     else:
         return char
 
 def SwapCase(char):
-    if type(char) == int:
+    if isinstance(char, int):
         return ord(chr(char).swapcase())
     else:
         return char.swapcase()
@@ -303,7 +303,7 @@ def HexcodeName2String(hexcodeName):
     return ''.join(map(Hexcode2String, hexcodeName))
 
 def SwapName(wordExact):
-    return map(SwapCase, wordExact)
+    return list(map(SwapCase, wordExact))
 
 def UpdateWords(word, wordExact, slash, words, hexcode, allNames, lastName, insideStream, oEntropy, fOut):
     if word != '':
@@ -329,7 +329,7 @@ def UpdateWords(word, wordExact, slash, words, hexcode, allNames, lastName, insi
             if slash == '/' and '/' + word in ('/JS', '/JavaScript', '/AA', '/OpenAction', '/JBIG2Decode', '/RichMedia', '/Launch'):
                 wordExactSwapped = HexcodeName2String(SwapName(wordExact))
                 fOut.write(C2BIP3(wordExactSwapped))
-                print('/%s -> /%s' % (HexcodeName2String(wordExact), wordExactSwapped))
+                print(('/%s -> /%s' % (HexcodeName2String(wordExact), wordExactSwapped)))
             else:
                 fOut.write(C2BIP3(HexcodeName2String(wordExact)))
     return ('', [], False, lastName, insideStream)
@@ -822,7 +822,7 @@ def File2Strings(filename):
     except:
         return None
     try:
-        return list(map(lambda line:line.rstrip('\n'), f.readlines()))
+        return list([line.rstrip('\n') for line in f.readlines()])
     except:
         return None
     finally:
@@ -844,7 +844,7 @@ def AddPlugin(cClass):
     plugins.append(cClass)
 
 def ExpandFilenameArguments(filenames):
-    return list(collections.OrderedDict.fromkeys(sum(map(glob.glob, sum(map(ProcessAt, filenames), [])), [])))
+    return list(collections.OrderedDict.fromkeys(sum(list(map(glob.glob, sum(list(map(ProcessAt, filenames)), []))), [])))
 
 class cPluginParent():
     onlyValidPDF = True
@@ -853,7 +853,7 @@ def LoadPlugins(plugins, verbose):
     if plugins == '':
         return
     scriptPath = os.path.dirname(sys.argv[0])
-    for plugin in sum(map(ProcessAt, plugins.split(',')), []):
+    for plugin in sum(list(map(ProcessAt, plugins.split(','))), []):
         try:
             if not plugin.lower().endswith('.py'):
                 plugin += '.py'
@@ -864,7 +864,7 @@ def LoadPlugins(plugins, verbose):
                         plugin = scriptPlugin
             exec(open(plugin, 'r').read())
         except Exception as e:
-            print('Error loading plugin: %s' % plugin)
+            print(('Error loading plugin: %s' % plugin))
             if verbose:
                 raise e
 

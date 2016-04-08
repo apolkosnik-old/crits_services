@@ -58,7 +58,7 @@ def snugglefish_search(indexes, search, user):
             for res in tmp:
                 if Sample.objects(md5=res, source__name__in=sources).count() > 0:
                     ret[idx]['files'].append(res)
-        except Exception, e:
+        except Exception as e:
             ret[idx]['reason'] = "Error: %s" % e
             ret[idx]['success'] = False
     return ret

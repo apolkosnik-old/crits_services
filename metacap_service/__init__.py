@@ -57,12 +57,12 @@ class MetaCapService(Service):
     def get_config(existing_config):
         config = {}
         fields = forms.MetaCapConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -72,7 +72,7 @@ class MetaCapService(Service):
 
         # Rename keys so they render nice.
         fields = forms.MetaCapConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
 
         return display_config

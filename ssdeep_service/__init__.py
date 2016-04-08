@@ -29,7 +29,7 @@ class SSDeepService(Service):
         else:     
             data = {}
             fields = forms.SSDeepRunForm().fields
-            for name, field in fields.iteritems():
+            for name, field in fields.items():
                 data[name] = field.initial
         return forms.SSDeepRunForm(data)
 

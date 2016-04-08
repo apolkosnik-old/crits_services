@@ -26,7 +26,7 @@ class CRITsScript(CRITsBaseScript):
 
         (options, args) = parser.parse_args(argv)
         if options.itype is None or (options.confidence is None and options.impact is None):
-            print "You must provide a type and at least a confidence or impact level to search for."
+            print("You must provide a type and at least a confidence or impact level to search for.")
             sys.exit(1)
         else:
             results = ci_search(options.itype, options.confidence, options.impact, options.action)
@@ -37,4 +37,4 @@ class CRITsScript(CRITsBaseScript):
                         if action["action_type"] in options.action and action["active"] == "off":
                             print_action = False
                 if print_action:
-                    print "%s" % result['value']
+                    print("%s" % result['value'])

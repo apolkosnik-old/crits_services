@@ -5,7 +5,7 @@ from crits.services.core import Service, ServiceConfigError
 from crits.certificates.handlers import handle_cert_file
 from crits.vocabulary.relationships import RelationshipTypes
 
-from machoinfo import MachOEntity, MachOParser, MachOParserError
+from .machoinfo import MachOEntity, MachOParser, MachOParserError
 
 class MachOInfoService(Service):
     name = "machoinfo"
@@ -38,7 +38,7 @@ class MachOInfoService(Service):
         mop = MachOParser(data)
         try:
             mop.parse()
-        except MachOParserError, e:
+        except MachOParserError as e:
             self._error("ERROR: %s" % e)
             return
 

@@ -5,7 +5,7 @@
 # PEhash computing code is from Team Cymru.
 # Wrapping into the CRITs module done by Adam Polkosnik.
 
-from __future__ import division
+
 
 import pefile
 import bitstring
@@ -24,6 +24,7 @@ from crits.samples.handlers import handle_file
 from crits.vocabulary.relationships import RelationshipTypes
 
 from . import forms
+import collections
 
 logger = logging.getLogger(__name__)
 
@@ -199,7 +200,7 @@ class PEInfoService(Service):
         else:
             self._debug("No TLS info")
 
-        if callable(getattr(pe, 'get_imphash', None)):
+        if isinstance(getattr(pe, 'get_imphash', None), collections.Callable):
             self._get_imphash(pe)
         else:
             self._debug("pefile does not support get_imphash, upgrade to 1.2.10-139")
@@ -232,7 +233,7 @@ class PEInfoService(Service):
         checksum = data[1]
         headervalues = []
 
-        for i in xrange(len(data) // 2):
+        for i in range(len(data) // 2):
             if data[2 * i] == 0x68636952: # Rich
                 if data[2 * i + 1] != checksum:
                     self._parse_error('Rich Header corrupted', Exception)
@@ -402,7 +403,7 @@ class PEInfoService(Service):
                 for entry in pe.FileInfo:
                     if hasattr(entry, 'StringTable'):
                         for st_entry in entry.StringTable:
-                            for str_entry in st_entry.entries.items():
+                            for str_entry in list(st_entry.entries.items()):
                                 try:
                                     value = str_entry[1].encode('ascii')
                                     result = {
@@ -422,7 +423,7 @@ class PEInfoService(Service):
                     elif hasattr(entry, 'Var'):
                         for var_entry in entry.Var:
                             if hasattr(var_entry, 'entry'):
-                                for key in var_entry.entry.keys():
+                                for key in list(var_entry.entry.keys()):
                                     try:
                                         value = var_entry.entry[key].encode('ascii')
                                         result = {

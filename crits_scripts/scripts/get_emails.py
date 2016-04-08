@@ -40,7 +40,7 @@ class CRITsScript(CRITsBaseScript):
         elif opts.json:
             meta_format = "json"
         else:
-            print(parser.format_help().strip())
+            print((parser.format_help().strip()))
             return
         emails = emails.find(query, {})
 
@@ -59,6 +59,6 @@ class CRITsScript(CRITsBaseScript):
                                 )
             if data:
                 pathname = os.path.join(path, email_id + "." + meta_format)
-                print "[+] Writing %s" % pathname
+                print("[+] Writing %s" % pathname)
                 with open(pathname, "wb") as f:
                     f.write(data)

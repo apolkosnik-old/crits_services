@@ -33,7 +33,7 @@ def call_supported_types(supported=[]):
             request_type = self.obj._meta['crits_type']
             if request_type not in supported:
                 logger.warn("PassiveTotal: Invalid type.")
-                self._warning("%s: Invalid type specified." % f.func_name)
+                self._warning("%s: Invalid type specified." % f.__name__)
                 return
             return f(self, *args)
         return wrapper
@@ -64,7 +64,7 @@ class PassiveTotalService(Service):
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -246,7 +246,7 @@ class PassiveTotalService(Service):
         client = self._generate_request_instance('whois')
         query = self._get_query_type(obj)
         field = 'email'
-        if type(query) == list:
+        if isinstance(query, list):
             for item in query:
                 results = client.search_whois_by_field(query=item, field=field)
                 self._check_response(results)

@@ -1,6 +1,6 @@
 from django import forms
 
-from snugglefish import SnuggleIndex
+from .snugglefish import SnuggleIndex
 
 class SnugglefishSearchForm(forms.Form):
     """Form for the snugglefish service's search dialog."""

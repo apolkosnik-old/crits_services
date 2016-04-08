@@ -27,7 +27,7 @@ class CRITsScript(CRITsBaseScript):
             try:
                 data = get_file(opts.md5, collection=collection)
             except:
-                print "[+] could not read data for %s" % opts.md5
+                print("[+] could not read data for %s" % opts.md5)
                 return
 
         if data:
@@ -37,10 +37,10 @@ class CRITsScript(CRITsBaseScript):
                 filename = get_filename(opts.md5, collection=collection)
             if filename == None:
                 filename = opts.md5
-            print "[+] writing %d bytes to %s" % (len(data), filename)
+            print("[+] writing %d bytes to %s" % (len(data), filename))
             try:
                 fin = open(filename, 'wb')
                 fin.write(data)
                 fin.close()
             except:
-                print "[+] error writing %s to disk" % filename
+                print("[+] error writing %s to disk" % filename)

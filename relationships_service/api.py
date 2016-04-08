@@ -65,7 +65,7 @@ class RelationshipsServiceResource(CRITsAPIResource):
         if types:
             types = types.split(',')
         else:
-            types = settings.CRITS_TYPES.keys()
+            types = list(settings.CRITS_TYPES.keys())
 
         if not ctype:
             raise BadRequest("Must specify CRITs type (ctype).")

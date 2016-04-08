@@ -37,12 +37,12 @@ class C1fappService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.C1fappConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.iteritems():
+            for key, value in existing_config.items():
                 config[key] = value
         return config
 
@@ -60,7 +60,7 @@ class C1fappService(Service):
         display_config = {}
 
         fields = forms.C1fappConfigForm().fields
-        for name, field in fields.iteritems():
+        for name, field in fields.items():
             display_config[field.label] = config[name]
 
         return display_config
@@ -100,7 +100,7 @@ class C1fappService(Service):
             assert cif_response.status_code == 200
             self._info("API Response status code: %s"
                        % cif_response.status_code)
-        except AssertionError, e:
+        except AssertionError as e:
             cif_response.close()
             if cif_response.status_code == 403:
                 self._error("API Response status code: %s"
@@ -116,7 +116,7 @@ class C1fappService(Service):
 
         try:
             results = json.loads(cif_response.text)
-        except Exception, e:
+        except Exception as e:
             self._info("No results could be decoded")
 
         if not results:
@@ -162,9 +162,9 @@ class C1fappService(Service):
 
                         }
                     self._add_result('Enrichment Data', entry['address'][0], stats)
-                except Exception,e:
+                except Exception as e:
                     pass
 
 
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)

@@ -7,7 +7,7 @@ class CRITsScript(CRITsBaseScript):
         self.username = username
 
     def run(self, argv):
-        print "Removing old detection results..."
+        print("Removing old detection results...")
         samples = mongo_connector(settings.COL_SAMPLES)
 
         samples.update({},

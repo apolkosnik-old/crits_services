@@ -81,7 +81,7 @@ class CRITsScript(CRITsBaseScript):
         xml -- filename or file-like object containing xml
         """
         
-        if isinstance(xml, basestring):
+        if isinstance(xml, str):
             f = open(xml, 'rb')
         else:
             f = xml
@@ -98,7 +98,7 @@ class CRITsScript(CRITsBaseScript):
         ns -- the namespace we are attempting to find a prefix for
         nsmap -- a dictionary containing prefix-to-namespace mappings
         """
-        for k,v in nsmap.iteritems():
+        for k,v in nsmap.items():
             if v == ns:
                 return k
         
@@ -243,7 +243,7 @@ class CRITsScript(CRITsBaseScript):
             fn = args.infile
             f = open(fn, 'r')
         except IOError:
-            print("[!] Cannot open %s for reading!" % (fn))
+            print(("[!] Cannot open %s for reading!" % (fn)))
             return
         except:
             print("[!] Cannot open file")

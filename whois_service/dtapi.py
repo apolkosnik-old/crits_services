@@ -108,7 +108,7 @@ class dtapi(object):
         params['timestamp'] = timestamp
         params['signature'] = signature
         params['api_username'] = self.config['username']
-        if 'format' not in params.keys():
+        if 'format' not in list(params.keys()):
             params['format'] = self.config['dataformat']
         req = requests.get(requesturl, params=params)
         if req.status_code != requests.codes.ok:

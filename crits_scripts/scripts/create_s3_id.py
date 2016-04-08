@@ -44,4 +44,4 @@ class CRITsScript(CRITsBaseScript):
 
     def run(self, argv):
         id = create_id()
-        print id
+        print(id)

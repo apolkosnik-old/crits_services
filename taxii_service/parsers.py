@@ -179,7 +179,7 @@ class STIXParser():
                             description = description.to_dict()
                         except:
                             pass
-                if incdnt.short_description in EventTypes.values():
+                if incdnt.short_description in list(EventTypes.values()):
                     event_type = incdnt.short_description
                 elif incdnt.categories and incdnt.categories[0].value:
                     event_type = get_crits_event_type(incdnt.categories[0].value)
@@ -309,7 +309,7 @@ class STIXParser():
                         self.failed.append((res['message'],
                                             "Threat Actor (%s)" % name,
                                             threat_actor.id_)) # note for display in UI
-            except Exception, e:
+            except Exception as e:
                 self.failed.append((e.message,
                                     "Threat Actor (%s)" % name,
                                     threat_actor.id_)) # note for display in UI
@@ -397,7 +397,7 @@ class STIXParser():
                 self.parse_observables(indicator.observables,
                                        description, indicator.id_)
 
-            except Exception, e:
+            except Exception as e:
                 self.failed.append((e.message,
                                     "Indicator (%s)" % indicator.id_,
                                     indicator.id_)) # note for display in UI
@@ -842,7 +842,7 @@ class STIXParser():
                 c_obj = make_crits_object(item)
 
                 # Ignore what was already caught above
-                if (ind_id or c_obj.object_type not in IPTypes.values()):
+                if (ind_id or c_obj.object_type not in list(IPTypes.values())):
                     ind_type = c_obj.object_type
                     for val in [str(v).strip() for v in c_obj.value if v]:
                         if ind_type:
@@ -864,7 +864,7 @@ class STIXParser():
                                                         description=description)
                             self.parse_res(imp_type, val, cbx_obj, res, ind_id)
 
-        except Exception, e: # probably caused by cybox object we don't handle
+        except Exception as e: # probably caused by cybox object we don't handle
             self.failed.append((e.message,
                                 "%s (%s)" % (imp_type, val),
                                 cbx_obj.id_)) # note for display in UI

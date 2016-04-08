@@ -24,9 +24,9 @@ class CRITsScript(CRITsBaseScript):
             source_dict = {}
 
             #handle string source "list"
-            if isinstance(source_list, basestring):
+            if isinstance(source_list, str):
                 obj_created_date = self.handle_string_source(source_list, source_dict, obj_created_date)
-                return [{'name':key, 'instances':val} for key,val in source_dict.items()]
+                return [{'name':key, 'instances':val} for key,val in list(source_dict.items())]
 
             #handle dict source "list"
             if isinstance(source_list, dict):
@@ -38,7 +38,7 @@ class CRITsScript(CRITsBaseScript):
                 #   original source.
                 source = deepcopy(source)
                 #handle string source
-                if isinstance(source, basestring):
+                if isinstance(source, str):
                     obj_created_date = self.handle_string_source(source, source_dict, obj_created_date)
                     continue
 
@@ -70,20 +70,20 @@ class CRITsScript(CRITsBaseScript):
                         else:
                             source['date'] = datetime.datetime.now()
                     else:
-                        if isinstance(source['date'], basestring):
+                        if isinstance(source['date'], str):
                             source['date'] = parse_datetime(source['date'])
                 if name in source_dict:
                     source_dict[name].append(source)
                 else:
                     source_dict[name] = [source]
-            return [{'name':key, 'instances':val} for key,val in source_dict.items()]
-        except Exception, e:
+            return [{'name':key, 'instances':val} for key,val in list(source_dict.items())]
+        except Exception as e:
             raise
-            print "issue: %s -> oid: %s" % (e, oid)
+            print("issue: %s -> oid: %s" % (e, oid))
             return []
 
     def handle_string_source(self, name, source_dict, obj_created_date=None):
-        if isinstance(obj_created_date, basestring):
+        if isinstance(obj_created_date, str):
             obj_created_date = parse_datetime(obj_created_date)
         d = {'method':'', 'reference':'', 'date':obj_created_date or datetime.datetime.now()}
         if name in source_dict:
@@ -98,13 +98,13 @@ class CRITsScript(CRITsBaseScript):
         doc_list = col.find({'source.instances': {'$exists': 0}}, {'_id': 1, 'source': 1, 'date':1, 'uploadDate':1, 'created':1, 'md5': 1}, timeout=False)
 
         count = doc_list.count()
-        print "\tFound %s documents that need updating." % count
+        print("\tFound %s documents that need updating." % count)
 
         i = 0
         # for each document
         for doc in doc_list:
             i += 1
-            print >> sys.stdout, "\r\tWorking on document %d of %d" % (i,count),
+            print("\r\tWorking on document %d of %d" % (i,count), end=' ', file=sys.stdout)
             sys.stdout.flush()
             query = {}
             # get the ID and the list of sources
@@ -123,20 +123,20 @@ class CRITsScript(CRITsBaseScript):
             col.update(query, update_query, safe=True)
         doc_list.close()
         if i > 0:
-            print "\n"
+            print("\n")
 
     def fix_fqdn_and_ip(self, collection):
         col = mongo_connector(collection)
         doc_list = col.find({}, {'_id': 1, 'fqdn': 1}, timeout=False)
 
         count = doc_list.count()
-        print "\tFound %s documents that need updating." % count
+        print("\tFound %s documents that need updating." % count)
 
         i = 0
         # for each document
         for doc in doc_list:
             i += 1
-            print >> sys.stdout, "\r\tWorking on document %d of %d" % (i,count),
+            print("\r\tWorking on document %d of %d" % (i,count), end=' ', file=sys.stdout)
             sys.stdout.flush()
             # get the ID and the list of sources
             oid = doc['_id']
@@ -164,23 +164,23 @@ class CRITsScript(CRITsBaseScript):
                     col.update({'_id':ObjectId(oid), 'fqdn.name':fqdn['name']}, {'$push':{'fqdn.$.ip_addresses':ip}})
         doc_list.close()
         if i > 0:
-            print "\n"
+            print("\n")
 
     def run(self, argv):
-        print "Migrating Emails..."
+        print("Migrating Emails...")
         self.fix_sources(settings.COL_EMAIL)
-        print "Migrating Indicators..."
+        print("Migrating Indicators...")
         self.fix_sources(settings.COL_INDICATORS)
-        print "Migrating Events..."
+        print("Migrating Events...")
         self.fix_sources(settings.COL_EVENTS)
-        print "Migrating PCAPs..."
+        print("Migrating PCAPs...")
         self.fix_sources(settings.COL_PCAPS)
-        print "Migrating Domains..."
+        print("Migrating Domains...")
         self.fix_sources(settings.COL_DOMAINS)
 
         # custom function for fqdn/ip
-        print "Migrating FQDNs and IPs..."
+        print("Migrating FQDNs and IPs...")
         self.fix_fqdn_and_ip(settings.COL_DOMAINS)
 
-        print "Migrating Samples..."
+        print("Migrating Samples...")
         self.fix_sources(settings.COL_SAMPLES)

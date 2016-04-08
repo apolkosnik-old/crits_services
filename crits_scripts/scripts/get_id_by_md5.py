@@ -24,6 +24,6 @@ class CRITsScript(CRITsBaseScript):
             if opts.md5:
                 sample = Sample.objects(md5=opts.md5).first()
         except Exception as e:
-            print "Bad things - '%s'" % e
+            print("Bad things - '%s'" % e)
         if sample:
-            print sample.id
+            print(sample.id)

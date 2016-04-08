@@ -37,7 +37,7 @@ class pyinstallerService(Service):
         return True
 
     def get_data(self, nm, arch):
-        if type(arch.toc) is type({}):
+        if isinstance(arch.toc, type({})):
             (ispkg, pos, lngth) = arch.toc.get(nm, (0, None, 0))
             if pos is None:
                 return None
@@ -64,7 +64,7 @@ class pyinstallerService(Service):
         with self._write_to_file() as tmp_file:
             try:
                 arch = get_archive(tmp_file)
-                if type(arch.toc) == type({}):
+                if isinstance(arch.toc, type({})):
                     toc = arch.toc
                 else:
                     toc = arch.toc.data
@@ -144,7 +144,7 @@ class pyinstallerService(Service):
                                                                         result['message'])
                                 )
                     self._add_result("Info", t[5], d)
-            except Exception, e:
+            except Exception as e:
                 self._info("Error: %s" % str(e))
 
     def run(self, obj, config):

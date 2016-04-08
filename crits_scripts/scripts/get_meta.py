@@ -49,10 +49,10 @@ class CRITsScript(CRITsBaseScript):
         end = element.find('.')
         if isinstance(value, dict):
             if end >= 0:
-                if value.has_key(element[:end]):
+                if element[:end] in value:
                     return self.get_val_dot(value[element[:end]], element[end+1:])
             else:
-                if value.has_key(element):
+                if element in value:
                     if isinstance(value[element], datetime.datetime):
                         return value[element].strftime("%D")
                     return value[element]
@@ -74,24 +74,24 @@ class CRITsScript(CRITsBaseScript):
         sample_list = self.get_sample_list(filter, meta)
         for sample in sample_list:
             sample["meta"] = self.parse_office_meta(sample["filetype"])
-            print self.print_csv(sample, output_filter)
+            print(self.print_csv(sample, output_filter))
 
     def get_yara_meta(self, filter):
         meta_filter = ["md5", "analysis.results.result", "analysis.service_name"]
         meta = self.make_meta(meta_filter)
         sample_list = self.get_sample_list(filter, meta)
         for item in sample_list:
-            if item.has_key("md5"):
-                if item.has_key("analysis"):
+            if "md5" in item:
+                if "analysis" in item:
                     for results in item["analysis"]:
                         #print results
                         try:
-                            if results.has_key("service_name"):
+                            if "service_name" in results:
                                 if results["service_name"] == "yara":
-                                    if results.has_key("results"):
+                                    if "results" in results:
                                         for result in results["results"]:
-                                            if result.has_key("result"):
-                                                print "'%s', '%s'" % (item["md5"], result["result"])
+                                            if "result" in result:
+                                                print("'%s', '%s'" % (item["md5"], result["result"]))
                         except:
                             pass
                             #print "error with %s" % item["md5"]
@@ -103,17 +103,17 @@ class CRITsScript(CRITsBaseScript):
         meta["analysis.service_name"] = 1
         sample_list = self.get_sample_list(filter, meta)
         for item in sample_list:
-            if item.has_key("md5"):
-                if item.has_key("analysis"):
+            if "md5" in item:
+                if "analysis" in item:
                     for results in item["analysis"]:
                         #print results
                         try:
-                            if results.has_key("service_name"):
+                            if "service_name" in results:
                                 if results["service_name"] == "pdfinfo":
-                                    if results.has_key("results"):
+                                    if "results" in results:
                                         for result in results["results"]:
-                                            if result.has_key("md5"):
-                                                print "'%s', '%s'" % (item["md5"], result["md5"])
+                                            if "md5" in result:
+                                                print("'%s', '%s'" % (item["md5"], result["md5"]))
                         except:
                             pass
                             #print "error with %s" % item["md5"]
