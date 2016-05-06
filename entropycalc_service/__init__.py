@@ -44,7 +44,7 @@ class EntropycalcService(Service):
         else:
             data = {}
             fields = forms.EntropyCalcRunForm().fields
-            for name, field in fields.items():
+            for name, field in list(fields.items()):
                 data[name] = field.initial
         return forms.EntropyCalcRunForm(data)
 

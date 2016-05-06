@@ -46,12 +46,12 @@ class ChopShopService(Service):
     def get_config(existing_config):
         config = {}
         fields = forms.ChopShopConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.items():
+            for key, value in list(existing_config.items()):
                 config[key] = value
         return config
 
@@ -61,7 +61,7 @@ class ChopShopService(Service):
 
         # Rename keys so they render nice.
         fields = forms.ChopShopConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             display_config[field.label] = config[name]
 
         return display_config
@@ -190,15 +190,15 @@ class jsonhandler(object):
             self.service._add_result("Metadata", request['method'], {"Type": "Method"})
             self.service._add_result("Metadata", response['status'], {"Type": "Status"})
 
-            for (header, value) in request['uri'].items():
+            for (header, value) in list(request['uri'].items()):
                 self.service._add_result("URI", value, {'Key': header})
 
-            for (header, value) in request['headers'].items():
+            for (header, value) in list(request['headers'].items()):
                 self.service._add_result("Request Headers", value, {'Header': header})
             if 'body_md5' in request:
                 self.service._add_result("Request Body MD5", request['body_md5'], {'Type': "Body MD5"})
 
-            for (header, value) in response['headers'].items():
+            for (header, value) in list(response['headers'].items()):
                 self.service._add_result("Response Headers", value, {'Header': header})
             if 'body_md5' in response:
                 self.service._add_result("Response Body MD5", response['body_md5'], {'Type': "Body MD5"})
@@ -208,7 +208,7 @@ class jsonhandler(object):
             self.service._add_result("Metadata", header['type'], {"Type": "Type"})
             for list_ in [data['questions'], data['rr']]:
                 for item in list_:
-                    for (header, value) in item.items():
+                    for (header, value) in list(item.items()):
                         self.service._add_result("Resource Record", value, {"Type": header})
 
     def handle_ctrl(self, message):

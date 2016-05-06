@@ -597,7 +597,7 @@ class MachOEntity(object):
         # Given the internal 'flagval' from a header, return a list
         # of the corresponding flag names.
         flaglist = []
-        for (k, v) in self.flags.items():
+        for (k, v) in list(self.flags.items()):
             if self.flagval & k == k:
                 flaglist.append(v)
         return flaglist

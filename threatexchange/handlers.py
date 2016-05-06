@@ -22,6 +22,7 @@ from pytx import (
 from pytx.errors import pytxFetchError
 from pytx.vocabulary import (
     Malware as m,
+    MalwareAnalysisTypes,
     MalwareFamilies as mf,
     Precision,
     PrivacyType,
@@ -117,7 +118,7 @@ def submit_query(request, url, type_, params=None):
         return {'success': False,
                 'message': "Invalid Type"}
     if url is None:
-        for k, v in params.items():
+        for k, v in list(params.items()):
             if len(params[k]) < 1 or params[k] == '':
                 params[k] = None
         try:
@@ -193,28 +194,46 @@ def get_members():
     return {'success': True,
             'html': html}
 
-def get_groups():
+def get_groups(manage=None):
     setup_access()
-    html = ''
-    owner = ThreatPrivacyGroup.mine(role="owner", dict_generator=True)
-    member = ThreatPrivacyGroup.mine(role="member", dict_generator=True)
+    owner_groups = ''
+    member_groups = ''
+    owner = ThreatPrivacyGroup.mine(role="owner")
+    member = ThreatPrivacyGroup.mine(role="member")
+    owner_template = "tx_group.html"
+    member_template = "tx_group.html"
+    if manage:
+        owner_template = "tx_group_owner.html"
+        member_template = "tx_group_member.html"
     for o in owner:
-        html += render_to_string("tx_member.html",
-                                    {
-                                        'member': o
-                                    })
+        members = o.get_members()
+        o = o.to_dict()
+        o['members'] = ",".join(x['name'] for x in members)
+        owner_groups += render_to_string(owner_template,
+                                         {
+                                             'group': o
+                                         })
     for mem in member:
-        if mem.get(tpg.MEMBERS_CAN_USE):
-            html += render_to_string("tx_member.html",
-                                        {
-                                            'member': o
-                                        })
-    return {'success': True,
-            'html': html}
+        members = mem.get_members()
+        mem = mem.to_dict()
+        mem['members'] = ",".join(x['name'] for x in members)
+        if mem.get(tpg.MEMBERS_CAN_USE) or manage:
+            member_groups += render_to_string(member_template,
+                                              {
+                                                  'group': mem
+                                              })
+    if manage:
+        return {'success': True,
+                'owner': owner_groups,
+                'member': member_groups}
+    else:
+        html = owner_groups + member_groups
+        return {'success': True,
+                'html': html}
 
 def get_class_attribute_values(klass):
     result = []
-    for k,v in klass.__dict__.items():
+    for k,v in list(klass.__dict__.items()):
         if not k.startswith('__') and not k.endswith('__'):
             result.append(v)
     return sorted(result)
@@ -224,12 +243,28 @@ def get_dropdowns():
     result['precision'] = get_class_attribute_values(Precision)
     result['privacy_type'] = get_class_attribute_values(PrivacyType)
     result['review_status'] = get_class_attribute_values(ReviewStatus)
+    result['sample_type'] = get_class_attribute_values(MalwareAnalysisTypes)
     result['severity'] = get_class_attribute_values(Severity)
     result['share_level'] = get_class_attribute_values(ShareLevel)
     result['status'] = get_class_attribute_values(Status)
     result['threat_type'] = get_class_attribute_values(ThreatType)
     result['types'] = get_class_attribute_values(Types)
     return result
+
+def get_mapped_itype(type_):
+    try:
+        itype = getattr(IndicatorTypes, type_)
+        return itype
+    except AttributeError:
+        pass
+    if type_ == Types.IP_ADDRESS:
+        # Really should validate that it's IPv4 and not IPv6
+        return IndicatorTypes.IPV4_ADDRESS
+    elif type_ == Types.IP_SUBNET:
+        # Really should validate that it's IPv4 and not IPv6
+        return IndicatorTypes.IPV4_SUBNET
+    else:
+        return None
 
 def export_object(request, type_, id_, params):
     setup_access()
@@ -258,9 +293,12 @@ def import_object(request, type_, id_):
         obj = ThreatDescriptor(id=id_)
         obj.details(
             fields=[f for f in ThreatDescriptor._default_fields if f not in
-                    (td.PRIVACY_MEMBERS, td.SUBMITTER_COUNT, td.METADATA)]
+                    (td.PRIVACY_MEMBERS, td.METADATA)]
         )
-        itype = getattr(IndicatorTypes, obj.get(td.TYPE))
+        itype = get_mapped_itype(obj.get(td.TYPE))
+        if itype is None:
+            return {'success': False,
+                    'message': "Descriptor type is not supported by CRITs"}
         ithreat_type = getattr(IndicatorThreatTypes, obj.get(td.THREAT_TYPE))
         results = handle_indicator_ind(
             obj.get(td.RAW_INDICATOR),
@@ -283,7 +321,7 @@ def import_object(request, type_, id_):
         obj = Malware(id=id_)
         obj.details(
             fields=[f for f in Malware._fields if f not in
-                    (td.PRIVACY_MEMBERS, td.METADATA)]
+                    (m.METADATA)]
         )
         filename = obj.get(m.MD5)
         try:
@@ -310,3 +348,37 @@ def import_object(request, type_, id_):
         return {'success': False,
                 'message': "Invalid Type"}
     return {'success': True}
+
+def add_edit_privacy_group(id_=None, name=None, description=None, members=None,
+                           members_can_see=False, members_can_use=False):
+    setup_access()
+    results = {'success': False}
+    if name is None:
+        results['html'] = "Must provide a name!"
+        return results
+    if not members_can_see and members_can_use:
+        results['html'] = "Members must be able to see if they are able to use!"
+        return results
+    d = {
+        'name': name,
+        'description': description,
+        'members': members,
+        'members_can_see': 1 if members_can_see else 0,
+        'members_can_use': 1 if members_can_use else 0,
+    }
+    if id_ is not None:
+        try:
+            tpg = ThreatPrivacyGroup(id=id_)
+            tpg.save(params=d)
+            results['success'] = True
+            results['html'] = "Success!"
+        except Exception as e:
+            results['html'] = e.message['message']
+    else:
+        try:
+            ThreatPrivacyGroup.new(params=d)
+            results['success'] = True
+            results['html'] = "Success!"
+        except Exception as e:
+            results['html'] = e.message['message']
+    return results

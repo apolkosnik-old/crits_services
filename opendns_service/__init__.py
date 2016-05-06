@@ -26,12 +26,12 @@ class OpenDNSService(Service):
     def get_config(existing_config):
         config = {}
         fields = forms.OpenDNSConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.items():
+            for key, value in list(existing_config.items()):
                 config[key] = value
         return config
 
@@ -46,7 +46,7 @@ class OpenDNSService(Service):
 
         # Rename keys so they render nice.
         fields = forms.OpenDNSConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             display_config[field.label] = config[name]
         return display_config
 

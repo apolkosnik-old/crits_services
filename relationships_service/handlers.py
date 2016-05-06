@@ -228,7 +228,7 @@ def gather_relationships(obj_type, obj_id, user, depth, types):
 
     campaign_cache = {}
     node_position = 0
-    for (obj_id, obj) in objects.items():
+    for (obj_id, obj) in list(objects.items()):
         if obj_id in obj_graph:
             continue
 
@@ -308,7 +308,7 @@ def gather_relationships(obj_type, obj_id, user, depth, types):
     # that when B->A is handled it will be ignored.
     link_dict = {}
 
-    for (tid, (tnode, source_ids)) in obj_graph.items():
+    for (tid, (tnode, source_ids)) in list(obj_graph.items()):
         for sid in source_ids:
             # If the graph is cut off the related object may not have been
             # collected. If the inverse relationship is already done, no

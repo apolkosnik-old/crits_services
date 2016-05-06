@@ -72,12 +72,12 @@ class VirusTotalService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.VirusTotalConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.items():
+            for key, value in list(existing_config.items()):
                 config[key] = value
         return config
 
@@ -102,7 +102,7 @@ class VirusTotalService(Service):
 
         # Rename keys so they render nice.
         fields = forms.VirusTotalConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             display_config[field.label] = config[name]
 
         return display_config
@@ -406,7 +406,7 @@ class VirusTotalService(Service):
         # PE Language Informaton
         pe_lang = additional_info_dict.get('pe-resource-langs', {})
         if pe_lang:
-            for k, v in pe_lang.items():
+            for k, v in list(pe_lang.items()):
                 self._add_result('Language Information', k, {'Value': v})
         else:
             status['message'].append("PE Language data not included in VT response.")

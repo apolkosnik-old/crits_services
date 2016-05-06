@@ -71,12 +71,12 @@ class pdf2txtService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.pdf2txtConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.items():
+            for key, value in list(existing_config.items()):
                 config[key] = value
         return config
 

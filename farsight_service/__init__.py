@@ -39,12 +39,12 @@ class FarsightService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.FarsightConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.items():
+            for key, value in list(existing_config.items()):
                 config[key] = value
         return config
 
@@ -71,7 +71,7 @@ class FarsightService(Service):
 
         # Rename keys so they render nice.
         fields = forms.FarsightConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             display_config[field.label] = config[name]
 
         return display_config
@@ -197,7 +197,7 @@ class FarsightService(Service):
             else:
                 results[rrtype] = [stats]
 
-        for rrtype, stats_list in results.items():
+        for rrtype, stats_list in list(results.items()):
             for stats in stats_list:
                 data = stats['data']
                 del stats['data']

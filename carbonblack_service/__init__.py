@@ -36,12 +36,12 @@ class CarbonBlackService(Service):
         # Generate default config from form and initial values.
         config = {}
         fields = forms.CarbonBlackInegrationConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             config[name] = field.initial
 
         # If there is a config in the database, use values from that.
         if existing_config:
-            for key, value in existing_config.items():
+            for key, value in list(existing_config.items()):
                 config[key] = value
         return config
 
@@ -59,7 +59,7 @@ class CarbonBlackService(Service):
         display_config = {}
         # Rename keys so they render nice.
         fields = forms.CarbonBlackInegrationConfigForm().fields
-        for name, field in fields.items():
+        for name, field in list(fields.items()):
             display_config[field.label] = config[name]
 
         return display_config
@@ -459,7 +459,7 @@ class CarbonBlackService(Service):
                     cp_data[child_pid]['process path'] = cpd[3]
 
             final_childproc_data = []
-            for child_pid, data in cp_data.items():
+            for child_pid, data in list(cp_data.items()):
                 cp = {}
                 cp['subtype'] = title
                 cp['result'] = data['process md5']

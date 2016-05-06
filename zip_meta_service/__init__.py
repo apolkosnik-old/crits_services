@@ -36,7 +36,7 @@ class ZipMetaService(Service):
             self._error("Could not parse document as a zip file")
             return
         for cd in parsedZip:
-            for name,value in cd.items():
+            for name,value in list(cd.items()):
                 if name == 'ZipExtraField':
                     continue
                 name = {"Name" : name}
@@ -50,14 +50,14 @@ class ZipMetaService(Service):
             if cd["ZipExtraField"]:
                 for dictionary in cd["ZipExtraField"]:
                     if dictionary["Name"] == "UnknownHeader":
-                        for name,value in dictionary.items():
+                        for name,value in list(dictionary.items()):
                             name = {"Name" : name}
                             if name == "Data":
                                 self._add_result(dictionary["Name"], name, name)
                             else:
                                 self._add_result(dictionary["Name"], str(value), name)
                     else:
-                        for name,value in dictionary.items():
+                        for name,value in list(dictionary.items()):
                             name = {"Name" : name}
                             self._add_result(dictionary["Name"], str(value), name)
             else:

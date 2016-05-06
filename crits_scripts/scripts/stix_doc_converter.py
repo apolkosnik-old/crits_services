@@ -101,7 +101,7 @@ class CRITsScript(CRITsBaseScript):
         ns -- the namespace we are attempting to find a prefix for
         nsmap -- a dictionary containing prefix-to-namespace mappings
         """
-        for k,v in nsmap.items():
+        for k,v in list(nsmap.items()):
             if v == ns:
                 return k
         
