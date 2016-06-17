@@ -124,5 +124,5 @@ class clamdService(Service):
         if output:
             out = output['stream']
             self._add_result('clamd',out[1], {'Status': out[0]})
-
+             obj.add_bucket_list(out[1], self.current_task.username)
 
